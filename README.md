@@ -15,8 +15,8 @@ cd llvm-project && git checkout 21f4b84c456b471cc52016cf360e14d45f7f2960 && cd .
 ```
 3. Build LLVM/MLIR:
 ```bash
-./build_mlir.sh configure
-./build_mlir.sh build
+./compile_mlir.sh configure
+./compile_mlir.sh build
 ```
 4. Clone onnx-mlir submodules:
 ```bash
@@ -25,8 +25,8 @@ git submodule update --init
 ```
 4. Build onnx-mlir and toy compiler:
 ```
-./build_onnxmlir.sh configure
-./build_onnxmlir.sh build
+./compile_onnxmlir.sh configure
+./compile_onnxmlir.sh build
 ```
 
 ### Usage
