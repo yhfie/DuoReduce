@@ -5,7 +5,9 @@
 import requests
 import json
 import csv
+import sys
 import re
+from datetime import date
 
 
 def get_code_snippets(body):
@@ -22,7 +24,7 @@ def get_code_snippets(body):
     return snippets_dict
 
 
-def crawl_issues(repo_owner, repo_name, state='all', labels=''):
+def crawl_issues(repo_owner, repo_name, state='all', labels='', crawl_type='complete'):
     """
     Retrieve the issues from the nominated repo. By default, all issues will be saved.
 
@@ -49,7 +51,8 @@ def crawl_issues(repo_owner, repo_name, state='all', labels=''):
 
         curr_issues = response.json()
         for issue in curr_issues:
-            issue_details = {
+            if (crawl_type == "complete"):
+                issue_details = {
                 'number': issue['number'],
                 'title': issue['title'],
                 'created_at': issue['created_at'],
@@ -58,6 +61,21 @@ def crawl_issues(repo_owner, repo_name, state='all', labels=''):
                 'body': issue['body'],
                 **get_code_snippets(issue['body']),
             }
+            
+            elif (crawl_type == "code"):
+                issue_details = {
+                'number': issue['number'],
+                **get_code_snippets(issue['body']),
+            }
+            # issue_details = {
+            #     'number': issue['number'],
+            #     'title': issue['title'],
+            #     'created_at': issue['created_at'],
+            #     'state': issue['state'],
+            #     'labels': ', '.join(label['name'] for label in issue['labels']),
+            #     'body': issue['body'],
+            #     **get_code_snippets(issue['body']),
+            # }
             issues.append(issue_details)
 
         if 'next' in response.links:
@@ -71,30 +89,82 @@ def crawl_issues(repo_owner, repo_name, state='all', labels=''):
 
 if __name__ == '__main__':
 
-    repo_owner = 'llvm'
-    repo_name = 'circt'
-    state = 'open'
-    labels = 'bug'
+    if len(sys.argv) != 6:
+        print('Usage: python crawl-issues.py <repo-owner> <repo-name> <issue-state> <issue-label> <crawl-type>')
+        exit(1) 
 
-    issues = crawl_issues(repo_owner, repo_name, state=state, labels=labels)
+    # repo_owner = 'llvm'
+    # repo_name = 'circt'
+    # state = 'open'
+    # labels = 'bug'
 
-    # Save issues to a JSON file
-    output_json_file = 'circt-issues-bug-complete.json'
-    # output_json_file = 'circt-issues-bug-code.json'
-    with open(output_json_file, 'w') as json_file:
-        json.dump(issues, json_file)
+    repo_owner = sys.argv[1]
+    repo_name = sys.argv[2]
+    state = sys.argv[3]
+    labels = sys.argv[4]
+    crawl_type = sys.argv[5]
 
-    # Save issues to a CSV file
-    output_csv_file = 'circt-issues-bug-complete.csv'
-    # output_csv_file = 'circt-issues-bug-code.csv'
-    with open(output_csv_file, 'w', newline='') as csv_file:
-        # Observation: no more than 10 code snippets in a single issue
-        fieldnames = ['number', 'title', 'created_at', 'state', 'labels', 'body'] + [
-            f'code_snippet_{i:02d}' for i in range(1, 11)]
-        # fieldnames = ['number'] + [f'code_snippet_{i:02d}' for i in range(1, 11)]
-        writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-        writer.writeheader()
-        for issue in issues:
-            writer.writerow(issue)
+    CRAWL_TYPES = ["complete", "code"]
+    if (crawl_type not in CRAWL_TYPES):
+        print('Usage: python crawl-issues.py <repo-owner> <repo-name> <issue-state> <issue-label> <crawl-type>')
+        print('crawl-type: complete | code')
+        exit(1)
+
+    issues = crawl_issues(repo_owner, repo_name, state=state, labels=labels, crawl_type=crawl_type)
+
+
+    today_date = date.today().strftime("%m%d%Y")
+
+    if (crawl_type == "complete"):
+        # Save issues to a JSON file
+        output_json_file = 'circt-issues-bug-complete-' + today_date + '.json'
+        with open(output_json_file, 'w') as json_file:
+            json.dump(issues, json_file)
+
+        # Save issues to a CSV file
+        output_csv_file = 'circt-issues-bug-complete-' + today_date + '.csv'
+        with open(output_csv_file, 'w', newline='') as csv_file:
+            # Observation: no more than 10 code snippets in a single issue
+            fieldnames = ['number', 'title', 'created_at', 'state', 'labels', 'body'] + [
+                f'code_snippet_{i:02d}' for i in range(1, 11)]
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+            for issue in issues:
+                writer.writerow(issue)
+    
+    elif (crawl_type == "code"):
+        # Save issues to a JSON file
+        output_json_file = 'circt-issues-bug-code-' + today_date + '.json'
+        with open(output_json_file, 'w') as json_file:
+            json.dump(issues, json_file)
+
+        # Save issues to a CSV file
+        output_csv_file = 'circt-issues-bug-code-' + today_date + '.csv'
+        with open(output_csv_file, 'w', newline='') as csv_file:
+            # Observation: no more than 10 code snippets in a single issue
+            fieldnames = ['number'] + [f'code_snippet_{i:02d}' for i in range(1, 11)]
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            writer.writeheader()
+            for issue in issues:
+                writer.writerow(issue)
+
+    # # Save issues to a JSON file
+    # output_json_file = 'circt-issues-bug-complete.json'
+    # # output_json_file = 'circt-issues-bug-code.json'
+    # with open(output_json_file, 'w') as json_file:
+    #     json.dump(issues, json_file)
+
+    # # Save issues to a CSV file
+    # output_csv_file = 'circt-issues-bug-complete.csv'
+    # # output_csv_file = 'circt-issues-bug-code.csv'
+    # with open(output_csv_file, 'w', newline='') as csv_file:
+    #     # Observation: no more than 10 code snippets in a single issue
+    #     fieldnames = ['number', 'title', 'created_at', 'state', 'labels', 'body'] + [
+    #         f'code_snippet_{i:02d}' for i in range(1, 11)]
+    #     # fieldnames = ['number'] + [f'code_snippet_{i:02d}' for i in range(1, 11)]
+    #     writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+    #     writer.writeheader()
+    #     for issue in issues:
+    #         writer.writerow(issue)
 
     print(f"Total number of open issues with the 'bug' label: {len(issues)}")
