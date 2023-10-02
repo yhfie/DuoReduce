@@ -4,25 +4,24 @@ from typing import List
 import re
 from itertools import combinations
 
-verilog_filename = []
 output_log_file = "output.log"
 MLIR_filename = "test.mlir"
 PASS_PHASES = [
-     "esi-connect-services",
-     "lower-hwarith-to-hw",
-     "lower-scf-to-calyx, canonicalize",
-     "msft-lower-constructs, msft-lower-instances",
-     "esi-emit-collateral{schema-file=schema.capnp}",
-     "lower-msft-to-hw",
-     "hw.module(lower-seq-hlmem)",
-     "lower-esi-to-physical, lower-esi-ports",
-     "lower-esi-to-hw",
-     "convert-fsm-to-sv",
-     "lower-seq-to-sv",
-     "cse, canonicalize, cse",
-     "lower-calyx-to-hw, canonicalize",
-     "hw.module(prettify-verilog), hw.module(hw-cleanup)",
-     "msft-export-tcl{tcl-file=target.tcl}"
+    "esi-connect-services",
+    "lower-hwarith-to-hw",
+    "lower-scf-to-calyx, canonicalize",
+    "msft-lower-constructs, msft-lower-instances",
+    "esi-emit-collateral{schema-file=schema.capnp}",
+    "lower-msft-to-hw",
+    "hw.module(lower-seq-hlmem)",
+    "lower-esi-to-physical, lower-esi-ports",
+    "lower-esi-to-hw",
+    "convert-fsm-to-sv",
+    "lower-seq-to-sv",
+    "cse, canonicalize, cse",
+    "lower-calyx-to-hw, canonicalize",
+    "hw.module(prettify-verilog), hw.module(hw-cleanup)",
+    "msft-export-tcl{tcl-file=target.tcl}"
 ]
 
 first_exe_flag = 1
@@ -33,6 +32,8 @@ def unique_ordered_elements(elements):
     seen = set()
     unique_elements = []
     for element in elements:
+        if element[0] == "@":
+            element = element[1:]
         if element not in seen:
             seen.add(element)
             unique_elements.append(element)
@@ -74,8 +75,8 @@ def get_possible_pass(input_code: str):
     compiler_variants = find_subsets(PASS_PHASES)
 
 
-def is_valid_execution(executed, process):
-    if executed+process in compiler_variants:
+def is_valid_execution(executed, process):  # check if the execution is valid or not. Return true if valid
+    if executed + process in compiler_variants:
         return True
     try:
         output = subprocess.check_output(["/home/jiyuan/circt/build/bin/circt-opt",
@@ -85,16 +86,17 @@ def is_valid_execution(executed, process):
         with open(output_log_file, "w") as f:
             f.write(output)
     except subprocess.CalledProcessError as error:
-        return True
+        return False
 
-    compiler_variants.append(executed+process)
-    return False
+    compiler_variants.append(executed + process)
+    return True
 
 
 def find_dependencies(executed, process):
     a = set()
     for item in executed:
-        flag = is_valid_execution(executed - item, process)
+        flag = is_valid_execution(executed - item,
+                                  process)  # if we delete an item and results in invalid execution, then this item should be include in dependency
         if not flag:
             a.add(item)
     return a
@@ -129,6 +131,8 @@ def dfs(processes, executed, dependencies, path, invalid_executions_cache):
 def contact_verilog_code(filename_list):
     contact_code = ""
     for filename in filename_list:
+        if not ("sv" in filename):
+            filename = filename+".sv"
         with open(filename, "r") as file:
             contact_code = contact_code + file.read()
     return contact_code
@@ -200,7 +204,7 @@ def extract_error_type(output):
     return None
 
 
-# TODO: Should combined with differential testing
+# TODO: Should be combined with differential testing
 def test_ir_code(code: str) -> bool:
     # Replace this function with your specific test that returns True if the code causes a failure
     # and False otherwise. For example, you could use a subprocess to run an MLIR pass and check
@@ -214,11 +218,15 @@ def test_ir_code(code: str) -> bool:
     generated_verilog_code = set()
     invalid_compiler_count = 0
     total_compiler_count = len(compiler_variants)
+    valid_compiler_variants = []
     verilog_filename = unique_ordered_elements(sv_name_pattern.findall(code))
     if len(verilog_filename) == 0:
-        print("no .sv generated")
+        print("no .sv name specified")
+        print("Warning: using name of the module to find generated .sv file. May introduce bugs")
+        verilog_filename = unique_ordered_elements(sv_possible_name_pattern.findall(code))
+    if len(verilog_filename) == 0:
+        print("no .sv file generated")
         return False
-    valid_compiler_variants = []
     for compiler in compiler_variants:
         try:
             output = subprocess.check_output(["/home/jiyuan/circt/build/bin/circt-opt",
@@ -235,7 +243,7 @@ def test_ir_code(code: str) -> bool:
                 print("correct .sv not generated!")
                 return False
 
-            if number < len(generated_verilog_code):
+            if number < len(generated_verilog_code):  #
                 valid_compiler_variants.append(compiler)
 
         except subprocess.CalledProcessError as error:
@@ -252,9 +260,10 @@ def test_ir_code(code: str) -> bool:
         return False
 
     try:
+        if not (".sv" in verilog_filename[0]):
+            verilog_filename[0] = verilog_filename[0] + ".sv"
         s_compilation_command = ["verilator"] + ["-Wno-fatal"] + ["-cc"] + ["--trace"] + verilog_filename + [
             "--exe"] + ["testbench.cpp"] + ["--top-module"] + [verilog_filename[0][:-3]]
-        print(verilog_filename)
         output = subprocess.check_output(s_compilation_command, stderr=subprocess.STDOUT, text=True)
         output = subprocess.check_output(["make", "-j", "-C", "obj_dir/", "-f", "V" + verilog_filename[0][:-3] + ".mk"],
                                          stderr=subprocess.STDOUT, text=True)
@@ -310,7 +319,7 @@ def ddmin_ir(code: str) -> str:
                         break
                 if test_ir_code(subset_code):
                     print("pass test!")
-                    print(subset_code)
+                    # print(subset_code)
                     # TODO: Mapping has bugs
                     # line_index = 0
                     # for code_line in subset:
@@ -327,6 +336,7 @@ def ddmin_ir(code: str) -> str:
     code_dictionary = [(code_lines[i], i) for i in range(len(code_lines))]
     minimized_map = [i for i in range(len(code_lines))]
     flag = test_ir_code(code)
+    print("initial flag:", flag)
     global first_exe_flag
     first_exe_flag = first_exe_flag + 1
     while flag:
@@ -339,69 +349,65 @@ def ddmin_ir(code: str) -> str:
 if __name__ == '__main__':
     #     Example usage:
     original_ir_code_file = sys.argv[1]
-    f = open(original_ir_code_file,"r")
+    f = open(original_ir_code_file, "r")
     original_ir_code = f.read()
 
-#     original_ir_code = """
-# // <python code>
-# module {
-#   msft.module @PolynomialSystem {} () -> (y: i32) attributes {childAppIDBases = ["poly"], fileName = "PolynomialSystem.sv"} {
-#     %c23_i32 = hw.constant 23 : i32
-#     %example.y = msft.instance @example @PolyComputeForCoeff__62__42__6_(%c23_i32)  {msft.appid = #msft.appid<"poly"[0]>} : (i32) -> i32
-#     %example2.y = msft.instance @example2 @PolyComputeForCoeff__62__42__6_(%example.y)  : (i32) -> i32
-#     %example2_1.y = msft.instance @example2_1 @PolyComputeForCoeff__1__2__3__4__5_(%example.y)  : (i32) -> i32
-#     %c23_i32_0 = hw.constant 23 : i32
-#     %b = hw.constant 0 : i32
-#     %0 = comb.divs %example.y, %b : i32
-#     msft.output %0 : i32
-#   }
-#   msft.module @PolyComputeForCoeff__62__42__6_ {coefficients = {coeff = [62, 42, 6]}} (%x: i32) -> (y: i32) attributes {fileName = "PolynomialCompute.sv"} {
-#     %c62_i32 = hw.constant 62 : i32
-#     %c42_i32 = hw.constant 42 : i32
-#     %0 = comb.mul %c42_i32, %x : i32
-#     %1 = comb.add %c62_i32, %0 : i32
-#     %c6_i32 = hw.constant 6 : i32
-#     %2 = comb.mul %x, %x : i32
-#     %3 = comb.mul %c6_i32, %2 : i32
-#     %4 = comb.add %1, %3 : i32
-#     msft.output %4 : i32
-#   }
-#   msft.module @PolyComputeForCoeff__1__2__3__4__5_ {coefficients = {coeff = [1, 2, 3, 4, 5]}} (%x: i32) -> (y: i32) attributes {fileName = "PolynomialCompute.sv"} {
-#     %c1_i32 = hw.constant 1 : i32
-#     %c2_i32 = hw.constant 2 : i32
-#     %0 = comb.mul %c2_i32, %x : i32
-#     %1 = comb.add %c1_i32, %0 : i32
-#     %c3_i32 = hw.constant 3 : i32
-#     %2 = comb.mul %x, %x : i32
-#     %3 = comb.mul %c3_i32, %2 : i32
-#     %4 = comb.add %1, %3 : i32
-#     %c4_i32 = hw.constant 4 : i32
-#     %5 = comb.mul %x, %x, %x : i32
-#     %6 = comb.mul %c4_i32, %5 : i32
-#     %7 = comb.add %4, %6 : i32
-#     %c5_i32 = hw.constant 5 : i32
-#     %8 = comb.mul %x, %x, %x, %x : i32
-#     %9 = comb.mul %c5_i32, %8 : i32
-#     %10 = comb.add %7, %9 : i32
-#     msft.output %10 : i32
-#   }
-# }
-#
-#     """
+    #     original_ir_code = """
+    # // <python code>
+    # module {
+    #   msft.module @PolynomialSystem {} () -> (y: i32) attributes {childAppIDBases = ["poly"], fileName = "PolynomialSystem.sv"} {
+    #     %c23_i32 = hw.constant 23 : i32
+    #     %example.y = msft.instance @example @PolyComputeForCoeff__62__42__6_(%c23_i32)  {msft.appid = #msft.appid<"poly"[0]>} : (i32) -> i32
+    #     %example2.y = msft.instance @example2 @PolyComputeForCoeff__62__42__6_(%example.y)  : (i32) -> i32
+    #     %example2_1.y = msft.instance @example2_1 @PolyComputeForCoeff__1__2__3__4__5_(%example.y)  : (i32) -> i32
+    #     %c23_i32_0 = hw.constant 23 : i32
+    #     %b = hw.constant 0 : i32
+    #     %0 = comb.divs %example.y, %b : i32
+    #     msft.output %0 : i32
+    #   }
+    #   msft.module @PolyComputeForCoeff__62__42__6_ {coefficients = {coeff = [62, 42, 6]}} (%x: i32) -> (y: i32) attributes {fileName = "PolynomialCompute.sv"} {
+    #     %c62_i32 = hw.constant 62 : i32
+    #     %c42_i32 = hw.constant 42 : i32
+    #     %0 = comb.mul %c42_i32, %x : i32
+    #     %1 = comb.add %c62_i32, %0 : i32
+    #     %c6_i32 = hw.constant 6 : i32
+    #     %2 = comb.mul %x, %x : i32
+    #     %3 = comb.mul %c6_i32, %2 : i32
+    #     %4 = comb.add %1, %3 : i32
+    #     msft.output %4 : i32
+    #   }
+    #   msft.module @PolyComputeForCoeff__1__2__3__4__5_ {coefficients = {coeff = [1, 2, 3, 4, 5]}} (%x: i32) -> (y: i32) attributes {fileName = "PolynomialCompute.sv"} {
+    #     %c1_i32 = hw.constant 1 : i32
+    #     %c2_i32 = hw.constant 2 : i32
+    #     %0 = comb.mul %c2_i32, %x : i32
+    #     %1 = comb.add %c1_i32, %0 : i32
+    #     %c3_i32 = hw.constant 3 : i32
+    #     %2 = comb.mul %x, %x : i32
+    #     %3 = comb.mul %c3_i32, %2 : i32
+    #     %4 = comb.add %1, %3 : i32
+    #     %c4_i32 = hw.constant 4 : i32
+    #     %5 = comb.mul %x, %x, %x : i32
+    #     %6 = comb.mul %c4_i32, %5 : i32
+    #     %7 = comb.add %4, %6 : i32
+    #     %c5_i32 = hw.constant 5 : i32
+    #     %8 = comb.mul %x, %x, %x, %x : i32
+    #     %9 = comb.mul %c5_i32, %8 : i32
+    #     %10 = comb.add %7, %9 : i32
+    #     msft.output %10 : i32
+    #   }
+    # }
+    #
+    #     """
 
     get_possible_pass(original_ir_code)
     sv_name_pattern = re.compile(r'fileName\s*=\s*"([^"]*.sv)"')
-
-    original_sv_code = '''
-     .a      (32'h3),    // after_phase_4.mlir:5:12783; after_phase_3.mlir:3:124
-     .b      (32'h0),    // after_phase_4.mlir:4:1243; after_phase_3.mlir:5:123
-    '''
+    sv_possible_name_pattern = re.compile(r'@\w+')
 
     # file = open(sys.argv[1], "r")
     # original_ir_code = file.read()
     # file.close()
 
-    initial_tracing_dict = location_information_parse(input_text_tracing=original_sv_code)
+    # initial_tracing_dict = location_information_parse(input_text_tracing=original_sv_code)
 
     minimized_ir_code = ddmin_ir(original_ir_code)
     print("Minimized IR code:")
