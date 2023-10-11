@@ -117,12 +117,14 @@ if __name__ == '__main__':
 
     if (crawl_type == "complete"):
         # Save issues to a JSON file
-        output_json_file = 'circt-issues-bug-complete-' + today_date + '.json'
+        # output_json_file = 'circt-issues-bug-complete-' + today_date + '.json'
+        output_json_file = repo_owner + '-' + repo_name + '-' + state + '-' + labels + '-' + crawl_type + '-' + today_date + '.json'
         with open(output_json_file, 'w') as json_file:
             json.dump(issues, json_file)
 
         # Save issues to a CSV file
-        output_csv_file = 'circt-issues-bug-complete-' + today_date + '.csv'
+        # output_csv_file = 'circt-issues-bug-complete-' + today_date + '.csv'
+        output_csv_file = repo_owner + '-' + repo_name + '-' + state + '-' + labels + '-' + crawl_type + '-' + today_date + '.csv'
         with open(output_csv_file, 'w', newline='') as csv_file:
             # Observation: no more than 10 code snippets in a single issue
             fieldnames = ['number', 'title', 'created_at', 'state', 'labels', 'body'] + [
