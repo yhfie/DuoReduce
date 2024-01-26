@@ -194,7 +194,8 @@ def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) 
     if len(verilog_filename) == 0:
         print("no .sv name specified")
         print("Warning: using name of the module to find generated .sv file. May introduce bugs")
-        verilog_filename = unique_ordered_elements(sv_possible_name_pattern.findall(code))
+        matches = sv_possible_name_pattern.findall(code)
+        verilog_filename = unique_ordered_elements(match[0] if match[0] else match[1] for match in matches)
     if len(verilog_filename) == 0:
         print("no .sv file generated")
 
@@ -220,7 +221,7 @@ def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) 
             return False, error.output[0]
 
     # If not, use our own oracle
-    
+
     for compiler in compiler_variants:      # In each round, dynamically figure out the valid compilation pass
         if (exe_round == 1) and (original_error != "True"):  # avoid repetitive execution for round 1
             if (len(valid_compiler_variants) >= 1) and (len(compiler) < len(valid_compiler_variants[0])):  # save
@@ -410,8 +411,8 @@ if __name__ == '__main__':
     # TODO: think about how to do "get possible pass"
     # get_possible_pass(original_ir_code)
     sv_name_pattern = re.compile(r'(?:output_file\s*<|fileName\s*=\s*)"([^"]+\.sv)"')
-    sv_possible_name_pattern = re.compile(r'@\w+|sym_name\s*=\s*"(.*?)"')
-
+    sv_possible_name_pattern = re.compile(r'@(\w+)|sym_name\s*=\s*"(.*?)"')
+    # sv_possible_name_pattern = re.compile(r'@\w+')# This one pass 6226.mlir test
     # file = open(sys.argv[1], "r")
     # original_ir_code = file.read()
     # file.close()
