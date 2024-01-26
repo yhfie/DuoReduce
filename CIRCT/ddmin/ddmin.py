@@ -1,30 +1,12 @@
-import subprocess
-import sys
-from typing import List
-import re
+import copy, multiprocessing, re, subprocess, sys, time, random
 from itertools import combinations
+from typing import List
+
+from dependency import find_dependency as quick_find
 
 output_log_file = "output.log"
-MLIR_filename = "test.mlir"
-PASS_PHASES = [
-    "esi-connect-services",
-    "lower-hwarith-to-hw",
-    "lower-scf-to-calyx, canonicalize",
-    "msft-lower-constructs, msft-lower-instances",
-    "esi-emit-collateral{schema-file=schema.capnp}",
-    "lower-msft-to-hw",
-    "hw.module(lower-seq-hlmem)",
-    "lower-esi-to-physical, lower-esi-ports",
-    "lower-esi-to-hw",
-    "convert-fsm-to-sv",
-    "lower-seq-to-sv",
-    "cse, canonicalize, cse",
-    "lower-calyx-to-hw, canonicalize",
-    "hw.module(prettify-verilog), hw.module(hw-cleanup)",
-    "msft-export-tcl{tcl-file=target.tcl}"
-]
 
-first_exe_flag = 1
+exe_round = 1
 compiler_variants = []
 
 
@@ -54,10 +36,7 @@ def get_possible_pass(input_code: str):
     pattern = re.compile(r'([^-,\s]+)(?:-([^-,]+))?(?:-([^-,]+))?')
     new_pass = []
     for passes in PASS_PHASES:
-        if "cse" in passes:
-            new_pass.append(passes)
-            continue
-        if "canonicalize" in passes:
+        if ("cse" in passes) or ("canonicalize" in passes):
             new_pass.append(passes)
             continue
 
@@ -66,64 +45,14 @@ def get_possible_pass(input_code: str):
         for item in result:
             if item in input_code:
                 new_pass.append(passes)
-                continue
-
+                break
     PASS_PHASES = new_pass
     print("Possible Pass:")
     print(PASS_PHASES)
     global compiler_variants
     compiler_variants = find_subsets(PASS_PHASES)
-
-
-def is_valid_execution(executed, process):  # check if the execution is valid or not. Return true if valid
-    if executed + process in compiler_variants:
-        return True
-    try:
-        output = subprocess.check_output(["/home/jiyuan/circt/build/bin/circt-opt",
-                                          "-pass-pipeline=" + executed + process + ",export-verilog,"
-                                                                                   "export-split-verilog",
-                                          MLIR_filename], stderr=subprocess.STDOUT, text=True)
-        with open(output_log_file, "w") as f:
-            f.write(output)
-    except subprocess.CalledProcessError as error:
-        return False
-
-    compiler_variants.append(executed + process)
-    return True
-
-
-def find_dependencies(executed, process):
-    a = set()
-    for item in executed:
-        flag = is_valid_execution(executed - item,
-                                  process)  # if we delete an item and results in invalid execution, then this item should be include in dependency
-        if not flag:
-            a.add(item)
-    return a
-
-
-def dfs(processes, executed, dependencies, path, invalid_executions_cache):
-    if not processes:
-        if len(path) > 0 and path[-1] == 'export-verilog':
-            compiler_variants.append(path)
-        return
-
-    process = processes[0]
-    next_processes = processes[1:]
-
-    # Execute the process
-    if process not in executed:
-
-        can_execute = is_valid_execution(executed, process)
-
-        if can_execute:
-            new_executed = executed | {process}
-            new_dependencies = dependencies.copy()
-            new_dependencies[process] = find_dependencies(executed, process)
-            dfs(next_processes, new_executed, new_dependencies, path + [process], invalid_executions_cache)
-
-    # Skip the process
-    dfs(next_processes, executed, dependencies, path, invalid_executions_cache)
+    print("Possible Compiler number:")
+    print(len(compiler_variants))
 
 
 # Jiyuan: maybe we can start from 3rd IR. TypeAlias seems related with system.py
@@ -132,7 +61,7 @@ def contact_verilog_code(filename_list):
     contact_code = ""
     for filename in filename_list:
         if not ("sv" in filename):
-            filename = filename+".sv"
+            filename = filename + ".sv"
         with open(filename, "r") as file:
             contact_code = contact_code + file.read()
     return contact_code
@@ -192,8 +121,8 @@ def location_information_parse(input_text_tracing="", IR=4):
                     if key in new_dict[new_key]:
                         new_dict[new_key].append(value)
 
-    print(new_dict)
-    print(original_dict)
+    # print(new_dict)
+    # print(original_dict)
     return new_dict
 
 
@@ -204,21 +133,7 @@ def extract_error_type(output):
     return None
 
 
-# TODO: Should be combined with differential testing
-def test_ir_code(code: str) -> bool:
-    # Replace this function with your specific test that returns True if the code causes a failure
-    # and False otherwise. For example, you could use a subprocess to run an MLIR pass and check
-    # the output or return code.
-
-    global compiler_variants
-    with open(MLIR_filename, "w") as f:
-        f.write(code)
-        f.close()
-
-    generated_verilog_code = set()
-    invalid_compiler_count = 0
-    total_compiler_count = len(compiler_variants)
-    valid_compiler_variants = []
+def verilog_execute(code: str) -> (bool, str):
     verilog_filename = unique_ordered_elements(sv_name_pattern.findall(code))
     if len(verilog_filename) == 0:
         print("no .sv name specified")
@@ -226,38 +141,7 @@ def test_ir_code(code: str) -> bool:
         verilog_filename = unique_ordered_elements(sv_possible_name_pattern.findall(code))
     if len(verilog_filename) == 0:
         print("no .sv file generated")
-        return False
-    for compiler in compiler_variants:
-        try:
-            output = subprocess.check_output(["/home/jiyuan/circt/build/bin/circt-opt",
-                                              "-pass-pipeline=" + compiler + ",export-verilog,export-split-verilog",
-                                              MLIR_filename], stderr=subprocess.STDOUT, text=True)
-            with open(output_log_file, "w") as f:
-                f.write(output)
-
-            number = len(generated_verilog_code)
-
-            try:
-                generated_verilog_code.add(contact_verilog_code(verilog_filename))
-            except FileNotFoundError:
-                print("correct .sv not generated!")
-                return False
-
-            if number < len(generated_verilog_code):  #
-                valid_compiler_variants.append(compiler)
-
-        except subprocess.CalledProcessError as error:
-            print("compilation error with " + compiler + ": " + error.output)
-            invalid_compiler_count = invalid_compiler_count + 1
-
-    if first_exe_flag == 1:
-        compiler_variants = valid_compiler_variants  # Jiyuan: that's one time effort
-        print("valid and unique compilation path:", len(valid_compiler_variants))
-        print(valid_compiler_variants)
-        print("invalid compilation path:", invalid_compiler_count)
-        print("total compilation path:", total_compiler_count)
-    if len(valid_compiler_variants) == 0:
-        return False
+        return False, "no .sv file generated"
 
     try:
         if not (".sv" in verilog_filename[0]):
@@ -269,7 +153,7 @@ def test_ir_code(code: str) -> bool:
                                          stderr=subprocess.STDOUT, text=True)
     except subprocess.CalledProcessError as error:
         print("simulator compilation error: " + error.output)
-        return False
+        return False, error.output
 
     try:
         output = subprocess.check_output(["./obj_dir/V" + verilog_filename[0][:-3]], stderr=subprocess.STDOUT,
@@ -279,20 +163,135 @@ def test_ir_code(code: str) -> bool:
             f.write(output)
     except subprocess.CalledProcessError as error:
         print("execution error: " + error.output)
-        return False
+        return False, error.output
 
     try:
-        output = subprocess.check_output(["mkdir", str(first_exe_flag) + "/"], stderr=subprocess.STDOUT,
+        output = subprocess.check_output(["mkdir", str(exe_round) + "/"], stderr=subprocess.STDOUT,
                                          text=True)
-        s_compilation_command = ["mv"] + verilog_filename + [str(first_exe_flag) + "/"]
+        s_compilation_command = ["mv"] + verilog_filename + [str(exe_round) + "/"]
         output = subprocess.check_output(s_compilation_command, stderr=subprocess.STDOUT, text=True)
     except subprocess.CalledProcessError as error:
         print(error)
-        return False
+        return False, "mkdir error"
+
+    return True, "True"
+
+
+def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) -> (bool, str):
+    # Replace this function with your specific test that returns True if the code causes a failure
+    # and False otherwise. For example, you could use a subprocess to run an MLIR pass and check
+    # the output or return code.
+
+    global compiler_variants
+    randomname = random.randint(1, 100000000)
+    MLIR_filename = "tmp" + str(randomname) + ".mlir"
+    with open(MLIR_filename, "w") as f:
+        f.write(code)
+        f.close()
+    generated_verilog_code = set()
+    valid_compiler_variants = []
+    verilog_filename = unique_ordered_elements(sv_name_pattern.findall(code))
+    if len(verilog_filename) == 0:
+        print("no .sv name specified")
+        print("Warning: using name of the module to find generated .sv file. May introduce bugs")
+        verilog_filename = unique_ordered_elements(sv_possible_name_pattern.findall(code))
+    if len(verilog_filename) == 0:
+        print("no .sv file generated")
+
+    if initial_error is not None:
+        original_error = initial_error  # assign initial error to this round as the flag
+    else:
+        original_error = "True"
+
+    start_time = time.time()
+    # Figure out the dependency graph if it is the first execution
+    if exe_round == 1:
+        dependency_graph, original_error, compiler_variants = quick_find(PASS_PHASES, mlir_name=MLIR_filename)
+        print("dependency:", dependency_graph)
+        print("passed compiler:", compiler_variants)
+        print("initial error:", original_error)
+
+    # Run script if provided
+    if script is not None:
+        try:
+            output = subprocess.check_output([script, MLIR_filename], stderr=subprocess.STDOUT, text=True)
+            return True, "True"
+        except subprocess.CalledProcessError as error:
+            return False, error.output[0]
+
+    # If not, use our own oracle
+    
+    for compiler in compiler_variants:      # In each round, dynamically figure out the valid compilation pass
+        if (exe_round == 1) and (original_error != "True"):  # avoid repetitive execution for round 1
+            if (len(valid_compiler_variants) >= 1) and (len(compiler) < len(valid_compiler_variants[0])):  # save
+                # the possible shortest faulty compilation to localize fault, since the compilation is not correct
+                valid_compiler_variants[0] = copy.deepcopy(compiler)
+            elif len(valid_compiler_variants) < 1:
+                valid_compiler_variants.append(compiler)
+            continue
+        try:
+            output = subprocess.check_output([execute_compiler,
+                                              "-pass-pipeline=builtin.module(" + ','.join(compiler) + ")",
+                                              MLIR_filename], stderr=subprocess.STDOUT, text=True)
+            with open(output_log_file, "w") as f:
+                f.write(output)
+
+            if original_error != "True":
+                continue
+
+            number = len(generated_verilog_code)
+
+            try:
+                generated_verilog_code.add(contact_verilog_code(verilog_filename))
+            except FileNotFoundError:
+                new_error_info = "correct .sv not generated!"
+
+            if number < len(generated_verilog_code):
+                # if new code is generated and added into the set, then we found a new valid and unique compiler
+                valid_compiler_variants.append(compiler)
+
+            if (len(valid_compiler_variants) == 1) and (len(compiler) < len(valid_compiler_variants[0])):
+                # save the shortest compilation path
+                valid_compiler_variants[0] = copy.deepcopy(compiler)
+
+        except subprocess.CalledProcessError as error:
+            new_error_info = error.output
+            if original_error in new_error_info:  # if the same compilation bug reproduced
+                if (len(valid_compiler_variants) >= 1) and (len(compiler) < len(valid_compiler_variants[0])):  # save
+                    # the possible shortest faulty compilation to localize fault, since the compilation is not correct
+                    valid_compiler_variants[0] = copy.deepcopy(compiler)
+                elif len(valid_compiler_variants) < 1:
+                    valid_compiler_variants.append(compiler)
+
+    # If it is the first round, print out the valid compilation path
+    if exe_round == 1:
+        print("valid and unique compilation path:", len(valid_compiler_variants))
+        print("valid and unique compilation path:", valid_compiler_variants)
+        compiler_variants = valid_compiler_variants  # Jiyuan: that's one time effort
+        end_time = time.time()
+        print(f"Execution time: {end_time - start_time} seconds")
+        if original_error != "True":
+            return True, original_error
+    if len(valid_compiler_variants) == 0:  # if no valid compiler found, return no valid compiler error
+        return False, "no valid compiler"
+
+    if verilog_execution:
+        return verilog_execute(code)
+
     # TODO: Above code is tested. Need to think about differential testing =>
     #  now the generated .sv files only contains the last successful compilation:
     #  should have all successful and unique compilation. And the code is stored in generated_verilog_code: see line 138
-    return True
+    print("TEST Compiler", valid_compiler_variants)
+    return True, original_error
+
+
+def codeset_execution(code_set: List[str], initial_flag) -> (List[str], bool):
+    for subset in code_set:
+        subset_code = '\n'.join(subset)
+        if test_ir_code(subset_code, initial_flag[1]) == initial_flag:
+            print("pass test!")
+            return subset_code.strip().split('\n'), True
+    return code_set, False
 
 
 # TODO: mapping undone
@@ -300,57 +299,66 @@ def ddmin_ir(code: str) -> str:
     def split_code(code: List[str], n: int) -> List[List[str]]:
         k, m = divmod(len(code), n)
         print("k:", k)
-        print("m:", m)
-        return [code[:i] + code[min(i + n, len(code)):] for i in range(len(code) - n)]
+        return [code[:i] + code[min(i + n, len(code)):] for i in range(len(code))]
 
-    def minimize(code: List[str]) -> (List[str], bool):
-        if len(code) == 1:
+    def divide_array(arr, n, flag):
+        k, m = divmod(len(arr), n)
+        sets = [arr[i * k: min((i + 1) * k, len(arr))] for i in range(n)]
+        ans = []
+        for element in sets:
+            ans.append((element, flag))
+        return ans
+
+    def minimize(code: List[str], initial_flag) -> (List[str], bool):
+        if len(code) <= 2:  # if codeline is too small, return False
             return code, False
 
-        n = len(code)
+        n = len(code) - 1
         while len(code) >= n > 0:
-            subsets = split_code(code, n)
-            print("now at deletion level:", n)
-            for subset in subsets:
-                subset_code = '\n'.join(subset)
-                for code_1, code_2 in zip(code, subset):
-                    if code_1 != code_2:
-                        print("delete start:", code_1)
-                        break
-                if test_ir_code(subset_code):
-                    print("pass test!")
-                    # print(subset_code)
-                    # TODO: Mapping has bugs
-                    # line_index = 0
-                    # for code_line in subset:
-                    #     while code_line != code_dictionary[line_index][0]:
-                    #         minimized_map.remove(line_index)
-                    #         line_index = line_index + 1
-                    return subset_code.strip().split('\n'), True
+            code_sets = divide_array(split_code(code, n), para, initial_flag)
+            with multiprocessing.Pool(processes=min(len(code_sets), para)) as pool:
+                print("now at deletion level:", n)
+                results = pool.starmap(codeset_execution, iterable=code_sets)
             n = n - 1
 
+            for result in results:
+                if result[1]:  # if codeline is too small, return False
+                    print(result[0])
+                    return result[0], True
         return code, False
 
     code_lines = code.strip().split('\n')
     minimized_code_lines = code_lines
     code_dictionary = [(code_lines[i], i) for i in range(len(code_lines))]
     minimized_map = [i for i in range(len(code_lines))]
-    flag = test_ir_code(code)
-    print("initial flag:", flag)
-    global first_exe_flag
-    first_exe_flag = first_exe_flag + 1
-    while flag:
-        minimized_code_lines, flag = minimize(minimized_code_lines)
-        first_exe_flag = first_exe_flag + 1
+    initial_flag = test_ir_code(code)
+    print("initial flag:", initial_flag)
+    global exe_round
+    syptom_keep_flag = True
+    exe_round = exe_round + 1
+    while syptom_keep_flag:
+        part_result, syptom_keep_flag = minimize(minimized_code_lines, initial_flag=initial_flag)
+        if len(part_result) < len(minimized_code_lines):
+            minimized_code_lines = copy.deepcopy(part_result)
+        exe_round = exe_round + 1
 
     return '\n'.join(minimized_code_lines)
 
 
 if __name__ == '__main__':
-    #     Example usage:
+    # Example usage:
     original_ir_code_file = sys.argv[1]
+    execute_compiler = sys.argv[2]
+    Pass_file = sys.argv[3]
     f = open(original_ir_code_file, "r")
     original_ir_code = f.read()
+    f = open(Pass_file, "r")
+    PASS_PHASES = f.read().strip().split('\n')
+    para = int(sys.argv[4])
+    try:
+        script = sys.argv[5]
+    except IndexError:
+        script = None
 
     #     original_ir_code = """
     # // <python code>
@@ -399,9 +407,10 @@ if __name__ == '__main__':
     #
     #     """
 
-    get_possible_pass(original_ir_code)
-    sv_name_pattern = re.compile(r'fileName\s*=\s*"([^"]*.sv)"')
-    sv_possible_name_pattern = re.compile(r'@\w+')
+    # TODO: think about how to do "get possible pass"
+    # get_possible_pass(original_ir_code)
+    sv_name_pattern = re.compile(r'(?:output_file\s*<|fileName\s*=\s*)"([^"]+\.sv)"')
+    sv_possible_name_pattern = re.compile(r'@\w+|sym_name\s*=\s*"(.*?)"')
 
     # file = open(sys.argv[1], "r")
     # original_ir_code = file.read()
@@ -411,8 +420,7 @@ if __name__ == '__main__':
 
     minimized_ir_code = ddmin_ir(original_ir_code)
     print("Minimized IR code:")
-    print(minimized_ir_code)
+    print(minimized_ir_code)  # minimized code saved into one mlir file: test.mlir
     print("compiler fault chain:")
     print(compiler_variants)
     # processes = [f'a{i}' for i in range(1, 101)]
-    # dfs(processes, set(), {}, [], {})
