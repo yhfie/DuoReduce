@@ -1,0 +1,23 @@
+#loc = loc("6226.mlir":3:20)
+#loc1 = loc("6226.mlir":6:20)
+#loc2 = loc("6226.mlir":9:20)
+#loc3 = loc("6226.mlir":12:20)
+"builtin.module"() ({
+  "hw.module"() ({
+  ^bb0(%arg0: i1):
+    "hw.output"() : () -> ()
+  }) {module_type = !hw.modty<input "" : i1>, parameters = [], port_locs = [#loc], sym_name = "Bar0"} : () -> ()
+  "hw.module"() ({
+  ^bb0(%arg0: i1):
+    "hw.output"() : () -> ()
+  }) {module_type = !hw.modty<input a : i1>, parameters = [], port_locs = [#loc1], sym_name = "Bar1"} : () -> ()
+  "hw.module"() ({
+  ^bb0(%arg0: i1):
+    "hw.output"() : () -> ()
+  }) {module_type = !hw.modty<input "space here" : i1>, parameters = [], port_locs = [#loc2], sym_name = "Bar2"} : () -> ()
+  "hw.module"() ({
+  ^bb0(%arg0: i1):
+    "hw.output"() : () -> ()
+  }) {module_type = !hw.modty<input "space here" : i1>, parameters = [], port_locs = [#loc3], sym_name = "Bar3"} : () -> ()
+}) : () -> ()
+
