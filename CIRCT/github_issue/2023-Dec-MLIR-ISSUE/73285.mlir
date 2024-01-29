@@ -1,3 +1,4 @@
+//mlir-opt --inline a.mlir
 module {
   llvm.func @malloc(i64) -> !llvm.ptr
   llvm.func @func2() -> vector<4xf16> {

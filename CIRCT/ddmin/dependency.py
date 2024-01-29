@@ -33,6 +33,10 @@ def execute_compiler(compiler_opt, compiler, mlir_name, initial_error=None) -> (
                                           mlir_name], stderr=subprocess.STDOUT, text=True)
     except subprocess.CalledProcessError as error:
         lines = str(error.output).split("\n")
+        for line in lines:
+            if ("Assertion" in line) and ("failed" in line):
+                lines[0] = line
+                break
         if lines[0] == initial_error:
             valid_compiler.append(compiler)
             return True, lines[0]
@@ -53,6 +57,10 @@ def execute_compiler(compiler_opt, compiler, mlir_name, initial_error=None) -> (
 def find_dependency(compiler_opt, passes, mlir_name):
     initial_flag, initial_error = execute_compiler(compiler_opt, passes, mlir_name)
     dependency: dict = {}
+    flag = initial_flag
+    while (len(passes) > 1) and flag:
+        passes = passes[:-1]
+        flag, new_error = execute_compiler(compiler_opt, passes, mlir_name, initial_error)
     while len(passes) > 1:
         n = len(passes) - 1
         Pn_dependency = set()

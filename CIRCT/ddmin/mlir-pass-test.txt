@@ -1,0 +1,2 @@
+func.func(test-match-reduction)
+(buffer-deallocation)

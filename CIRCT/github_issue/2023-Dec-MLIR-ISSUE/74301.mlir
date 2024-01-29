@@ -1,4 +1,4 @@
-#~/circt/llvm/build/bin/mlir-opt --canonicalize 74301.mlir
+//~/circt/llvm/build/bin/mlir-opt --canonicalize 74301.mlir
 func.func private @func2() {
   %cst_12 = arith.constant dense<23> : vector<15xindex>
   %cst_13 = arith.constant dense<false> : vector<15xi1>
