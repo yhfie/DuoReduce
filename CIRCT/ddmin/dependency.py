@@ -25,10 +25,10 @@ PASS_PHASES = [
 ]
 
 
-def execute_compiler(compiler, mlir_name, initial_error=None) -> (bool, str):
+def execute_compiler(compiler_opt, compiler, mlir_name, initial_error=None) -> (bool, str):
     global valid_compiler
     try:
-        output = subprocess.check_output(["/home/jiyuan/circt/build/bin/circt-opt",
+        output = subprocess.check_output([compiler_opt,
                                           "-pass-pipeline=builtin.module(" + ','.join(compiler) + ")",
                                           mlir_name], stderr=subprocess.STDOUT, text=True)
     except subprocess.CalledProcessError as error:
@@ -50,8 +50,8 @@ def execute_compiler(compiler, mlir_name, initial_error=None) -> (bool, str):
     return True, "True"
 
 
-def find_dependency(passes, mlir_name):
-    initial_flag, initial_error = execute_compiler(passes, mlir_name)
+def find_dependency(compiler_opt, passes, mlir_name):
+    initial_flag, initial_error = execute_compiler(compiler_opt, passes, mlir_name)
     dependency: dict = {}
     while len(passes) > 1:
         n = len(passes) - 1
@@ -64,7 +64,7 @@ def find_dependency(passes, mlir_name):
             Ci_prime = Ci + list(Pn_dependency) + [passes[-1]]
 
             # Execute Ci'
-            flag, new_error = execute_compiler(Ci_prime, mlir_name, initial_error)
+            flag, new_error = execute_compiler(compiler_opt, Ci_prime, mlir_name, initial_error)
             if flag is False:
                 Pn_dependency.add(passes[i])
         dependency[passes[-1]] = Pn_dependency

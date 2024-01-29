@@ -184,7 +184,7 @@ def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) 
 
     global compiler_variants
     randomname = random.randint(1, 100000000)
-    MLIR_filename = "tmp" + str(randomname) + ".mlir"
+    MLIR_filename = "tmp/tmp" + str(randomname) + ".mlir"
     with open(MLIR_filename, "w") as f:
         f.write(code)
         f.close()
@@ -207,7 +207,7 @@ def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) 
     start_time = time.time()
     # Figure out the dependency graph if it is the first execution
     if exe_round == 1:
-        dependency_graph, original_error, compiler_variants = quick_find(PASS_PHASES, mlir_name=MLIR_filename)
+        dependency_graph, original_error, compiler_variants = quick_find(execute_compiler, PASS_PHASES, mlir_name=MLIR_filename)
         print("dependency:", dependency_graph)
         print("passed compiler:", compiler_variants)
         print("initial error:", original_error)
