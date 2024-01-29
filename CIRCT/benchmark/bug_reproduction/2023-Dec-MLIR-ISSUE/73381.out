@@ -1,0 +1,30 @@
+// /home/yqiu054/circt/llvm/build/bin/mlir-opt --arith-emulate-wide-int 73381.mlir > 73381.out
+
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.      Program arguments: /home/yqiu054/circt/llvm/build/bin/mlir-opt --arith-emulate-wide-int 73381.mlir
+ #0 0x0000560ddbd55daf llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x15c5daf)
+ #1 0x0000560ddbd52e04 SignalHandler(int) Signals.cpp:0:0
+ #2 0x00007f80fbb44420 __restore_rt (/lib/x86_64-linux-gnu/libpthread.so.0+0x14420)
+ #3 0x0000560ddc3d71e3 _ZSt9__find_ifIN4mlir17ValueTypeIteratorIN4llvm6detail27indexed_accessor_range_baseINS0_12OperandRangeEPNS0_9OpOperandENS0_5ValueES8_S8_E8iteratorEEEN9__gnu_cxx5__ops12_Iter_negateIZNKS0_13TypeConverter7isLegalINS0_14ValueTypeRangeIS5_EEEENSt9enable_ifIXaantsrSt14is_convertibleIT_NS0_4TypeEE5valuentsrSK_ISL_PNS0_9OperationEE5valueEbE4typeEOSL_EUlSM_E_EEESL_SL_SL_T0_St26random_access_iterator_tag (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x1c471e3)
+ #4 0x0000560ddeb92615 mlir::TypeConverter::isLegal(mlir::Operation*) const (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4402615)
+ #5 0x0000560ddc05bc63 std::_Function_handler<std::optional<bool> (mlir::Operation*), (anonymous namespace)::EmulateWideIntPass::runOnOperation()::'lambda0'(mlir::Operation*)>::_M_invoke(std::_Any_data const&, mlir::Operation*&&) EmulateWideInt.cpp:0:0
+ #6 0x0000560ddeb845ef mlir::ConversionTarget::isLegal(mlir::Operation*) const (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43f45ef)
+ #7 0x0000560ddeb98add (anonymous namespace)::OperationLegalizer::legalize(mlir::Operation*, mlir::ConversionPatternRewriter&) DialectConversion.cpp:0:0
+ #8 0x0000560ddeb99947 (anonymous namespace)::OperationConverter::convertOperations(llvm::ArrayRef<mlir::Operation*>, llvm::function_ref<void (mlir::Diagnostic&)>) DialectConversion.cpp:0:0
+ #9 0x0000560ddeb9bdb4 mlir::applyPartialConversion(mlir::Operation*, mlir::ConversionTarget const&, mlir::FrozenRewritePatternSet const&, llvm::DenseSet<mlir::Operation*, llvm::DenseMapInfo<mlir::Operation*, void>>*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x440bdb4)
+#10 0x0000560ddc0721c3 (anonymous namespace)::EmulateWideIntPass::runOnOperation() EmulateWideInt.cpp:0:0
+#11 0x0000560ddeaf3dce mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4363dce)
+#12 0x0000560ddeaf42aa mlir::detail::OpToOpPassAdaptor::runPipeline(mlir::OpPassManager&, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int, mlir::PassInstrumentor*, mlir::PassInstrumentation::PipelineParentInfo const*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43642aa)
+#13 0x0000560ddeaf4a64 mlir::PassManager::run(mlir::Operation*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4364a64)
+#14 0x0000560ddeae5823 performActions(llvm::raw_ostream&, std::shared_ptr<llvm::SourceMgr> const&, mlir::MLIRContext*, mlir::MlirOptMainConfig const&) MlirOptMain.cpp:0:0
+#15 0x0000560ddeae6da4 processBuffer(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::MlirOptMainConfig const&, mlir::DialectRegistry&, llvm::ThreadPool*) MlirOptMain.cpp:0:0
+#16 0x0000560ddeae6f54 mlir::LogicalResult llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>::callback_fn<mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&)::'lambda'(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>(long, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&) MlirOptMain.cpp:0:0
+#17 0x0000560ddebe3b04 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4453b04)
+#18 0x0000560ddeadf3b7 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x434f3b7)
+#19 0x0000560ddeae70a1 mlir::MlirOptMain(int, char**, llvm::StringRef, llvm::StringRef, mlir::DialectRegistry&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43570a1)
+#20 0x0000560ddeae7526 mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4357526)
+#21 0x0000560ddbcb304b main (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x152304b)
+#22 0x00007f80fb5f2083 __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24083)
+#23 0x0000560ddbd2571e _start (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x159571e)
+Segmentation fault (core dumped)

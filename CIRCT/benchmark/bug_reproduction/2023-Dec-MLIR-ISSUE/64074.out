@@ -1,0 +1,39 @@
+// /home/yqiu054/circt/llvm/build/bin/mlir-opt -test-vector-unrolling-patterns=unroll-based-on-type 64074.mlir > 64074.out
+
+mlir-opt: /home/yqiu054/circt/llvm/mlir/lib/Dialect/Vector/IR/VectorOps.cpp:3200: mlir::Type inferStridedSliceOpResultType(mlir::VectorType, mlir::ArrayAttr, mlir::ArrayAttr, mlir::ArrayAttr): Assertion `offsets.size() == sizes.size() && offsets.size() == strides.size()' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.      Program arguments: /home/yqiu054/circt/llvm/build/bin/mlir-opt -test-vector-unrolling-patterns=unroll-based-on-type 64074.mlir
+ #0 0x000055d890ba7daf llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x15c5daf)
+ #1 0x000055d890ba4e04 SignalHandler(int) Signals.cpp:0:0
+ #2 0x00007f679ca45420 __restore_rt (/lib/x86_64-linux-gnu/libpthread.so.0+0x14420)
+ #3 0x00007f679c51200b raise (/lib/x86_64-linux-gnu/libc.so.6+0x4300b)
+ #4 0x00007f679c4f1859 abort (/lib/x86_64-linux-gnu/libc.so.6+0x22859)
+ #5 0x00007f679c4f1729 (/lib/x86_64-linux-gnu/libc.so.6+0x22729)
+ #6 0x00007f679c502fd6 (/lib/x86_64-linux-gnu/libc.so.6+0x33fd6)
+ #7 0x000055d892cf5fb1 inferStridedSliceOpResultType(mlir::VectorType, mlir::ArrayAttr, mlir::ArrayAttr, mlir::ArrayAttr) VectorOps.cpp:0:0
+ #8 0x000055d892d29bcb mlir::vector::ExtractStridedSliceOp::build(mlir::OpBuilder&, mlir::OperationState&, mlir::Value, llvm::ArrayRef<long>, llvm::ArrayRef<long>, llvm::ArrayRef<long>) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x3747bcb)
+ #9 0x000055d892e08e5c (anonymous namespace)::UnrollElementwisePattern::matchAndRewrite(mlir::Operation*, mlir::PatternRewriter&) const (.part.0) VectorUnroll.cpp:0:0
+#10 0x000055d895b73c20 mlir::PatternApplicator::matchAndRewrite(mlir::Operation*, mlir::PatternRewriter&, llvm::function_ref<bool (mlir::Pattern const&)>, llvm::function_ref<void (mlir::Pattern const&)>, llvm::function_ref<mlir::LogicalResult (mlir::Pattern const&)>) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x6591c20)
+#11 0x000055d8939fa39f (anonymous namespace)::GreedyPatternRewriteDriver::processWorklist() GreedyPatternRewriteDriver.cpp:0:0
+#12 0x000055d8939fd23b mlir::applyPatternsAndFoldGreedily(mlir::Region&, mlir::FrozenRewritePatternSet const&, mlir::GreedyRewriteConfig, bool*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x441b23b)
+#13 0x000055d8938294ea mlir::applyPatternsAndFoldGreedily(mlir::Operation*, mlir::FrozenRewritePatternSet const&, mlir::GreedyRewriteConfig, bool*) (.constprop.0) TestVectorTransforms.cpp:0:0
+#14 0x000055d8938340be (anonymous namespace)::TestVectorUnrollingPatterns::runOnOperation() TestVectorTransforms.cpp:0:0
+#15 0x000055d893945dce mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4363dce)
+#16 0x000055d8939462aa mlir::detail::OpToOpPassAdaptor::runPipeline(mlir::OpPassManager&, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int, mlir::PassInstrumentor*, mlir::PassInstrumentation::PipelineParentInfo const*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43642aa)
+#17 0x000055d893946c3c mlir::detail::OpToOpPassAdaptor::runOnOperationAsyncImpl(bool)::'lambda'(mlir::detail::OpToOpPassAdaptor::runOnOperationAsyncImpl(bool)::OpPMInfo&)::operator()(mlir::detail::OpToOpPassAdaptor::runOnOperationAsyncImpl(bool)::OpPMInfo&) const Pass.cpp:0:0
+#18 0x000055d893945425 mlir::detail::OpToOpPassAdaptor::runOnOperationAsyncImpl(bool) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4363425)
+#19 0x000055d893945b6a mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4363b6a)
+#20 0x000055d8939462aa mlir::detail::OpToOpPassAdaptor::runPipeline(mlir::OpPassManager&, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int, mlir::PassInstrumentor*, mlir::PassInstrumentation::PipelineParentInfo const*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43642aa)
+#21 0x000055d893946a64 mlir::PassManager::run(mlir::Operation*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4364a64)
+#22 0x000055d893937823 performActions(llvm::raw_ostream&, std::shared_ptr<llvm::SourceMgr> const&, mlir::MLIRContext*, mlir::MlirOptMainConfig const&) MlirOptMain.cpp:0:0
+#23 0x000055d893938da4 processBuffer(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::MlirOptMainConfig const&, mlir::DialectRegistry&, llvm::ThreadPool*) MlirOptMain.cpp:0:0
+#24 0x000055d893938f54 mlir::LogicalResult llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>::callback_fn<mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&)::'lambda'(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>(long, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&) MlirOptMain.cpp:0:0
+#25 0x000055d893a35b04 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4453b04)
+#26 0x000055d8939313b7 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x434f3b7)
+#27 0x000055d8939390a1 mlir::MlirOptMain(int, char**, llvm::StringRef, llvm::StringRef, mlir::DialectRegistry&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43570a1)
+#28 0x000055d893939526 mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4357526)
+#29 0x000055d890b0504b main (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x152304b)
+#30 0x00007f679c4f3083 __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24083)
+#31 0x000055d890b7771e _start (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x159571e)
+Aborted (core dumped)

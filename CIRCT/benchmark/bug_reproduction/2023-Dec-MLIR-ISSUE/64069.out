@@ -1,0 +1,5 @@
+// /home/yqiu054/circt/llvm/build/bin/mlir-opt "-sparse-compiler=enable-runtime-library=false vl=2 reassociate-fp-reductions=true" 64069.mlir > 64069.out
+
+
+mlir-opt: Unknown command line argument '-sparse-compiler=enable-runtime-library=false vl=2 reassociate-fp-reductions=true'.  Try: '/home/yqiu054/circt/llvm/build/bin/mlir-opt --help'
+mlir-opt: Did you mean '--sparsifier=enable-runtime-library=false vl=2 reassociate-fp-reductions=true'?

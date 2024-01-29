@@ -1,0 +1,68 @@
+// /home/yqiu054/circt/llvm/build/bin/mlir-opt -pass-pipeline='builtin.module(func.func(test-match-reduction))' 64071.mlir > 64071.out
+
+
+64071.mlir:3:3: remark: Testing function
+  func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
+  ^
+64071.mlir:3:3: note: see current operation: 
+func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
+  %c9777_i16 = arith.constant 9777 : i16
+  %c-3527_i16 = arith.constant -3527 : i16
+  %c2 = arith.constant 2 : index
+  %0 = index.ceildivu %c2, %c2
+  %1 = index.ceildivu %c2, %c2
+  %2 = index.sizeof
+  %3 = index.divs %c2, %c2
+  %4 = affine.apply affine_map<(d0, d1, d2, d3) -> (d0 - 16)>(%3, %1, %c2, %2)
+  scf.index_switch %4 
+  default {
+    %5 = scf.index_switch %c2 -> memref<23x8xi1> 
+    default {
+      %6 = tensor.empty() : tensor<7xi16>
+      %7 = tensor.empty() : tensor<i16>
+      %8 = linalg.dot ins(%6, %6 : tensor<7xi16>, tensor<7xi16>) outs(%7 : tensor<i16>) -> tensor<i16>
+      %alloc = memref.alloc() : memref<23x8xi1>
+      scf.yield %alloc : memref<23x8xi1>
+    }
+  }
+  return
+}
+64071.mlir:18:16: remark: Reduction NOT found in output #0!
+        %149 = linalg.dot ins(%147, %147 : tensor<7xi16>, tensor<7xi16>) outs(%148 : tensor<i16>) -> tensor<i16>
+               ^
+64071.mlir:18:16: note: see current operation: %8 = linalg.dot ins(%6, %6 : tensor<7xi16>, tensor<7xi16>) outs(%7 : tensor<i16>) -> tensor<i16>
+mlir-opt: /home/yqiu054/circt/llvm/llvm/include/llvm/ADT/ArrayRef.h:443: T& llvm::MutableArrayRef<T>::operator[](size_t) const [with T = mlir::OpOperand; size_t = long unsigned int]: Assertion `Index < this->size() && "Invalid index!"' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.      Program arguments: /home/yqiu054/circt/llvm/build/bin/mlir-opt -pass-pipeline=builtin.module(func.func(test-match-reduction)) 64071.mlir
+ #0 0x000056306720edaf llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x15c5daf)
+ #1 0x000056306720be04 SignalHandler(int) Signals.cpp:0:0
+ #2 0x00007f7a73c0f420 __restore_rt (/lib/x86_64-linux-gnu/libpthread.so.0+0x14420)
+ #3 0x00007f7a736dc00b raise (/lib/x86_64-linux-gnu/libc.so.6+0x4300b)
+ #4 0x00007f7a736bb859 abort (/lib/x86_64-linux-gnu/libc.so.6+0x22859)
+ #5 0x00007f7a736bb729 (/lib/x86_64-linux-gnu/libc.so.6+0x22729)
+ #6 0x00007f7a736ccfd6 (/lib/x86_64-linux-gnu/libc.so.6+0x33fd6)
+ #7 0x0000563069f6e19c mlir::matchReduction(llvm::ArrayRef<mlir::BlockArgument>, unsigned int, llvm::SmallVectorImpl<mlir::Operation*>&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x432519c)
+ #8 0x0000563069a164ad void llvm::function_ref<void (mlir::Operation*)>::callback_fn<(anonymous namespace)::TestMatchReductionPass::runOnOperation()::'lambda'(mlir::Operation*)>(long, mlir::Operation*) TestMatchReduction.cpp:0:0
+ #9 0x0000563069a15020 void mlir::detail::walk<mlir::ForwardIterator>(mlir::Operation*, llvm::function_ref<void (mlir::Operation*)>, mlir::WalkOrder) (.constprop.1) TestMatchReduction.cpp:0:0
+#10 0x0000563069a1507c void mlir::detail::walk<mlir::ForwardIterator>(mlir::Operation*, llvm::function_ref<void (mlir::Operation*)>, mlir::WalkOrder) (.constprop.1) TestMatchReduction.cpp:0:0
+#11 0x0000563069a1507c void mlir::detail::walk<mlir::ForwardIterator>(mlir::Operation*, llvm::function_ref<void (mlir::Operation*)>, mlir::WalkOrder) (.constprop.1) TestMatchReduction.cpp:0:0
+#12 0x0000563069a16030 (anonymous namespace)::TestMatchReductionPass::runOnOperation() TestMatchReduction.cpp:0:0
+#13 0x0000563069facdce mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4363dce)
+#14 0x0000563069fad2aa mlir::detail::OpToOpPassAdaptor::runPipeline(mlir::OpPassManager&, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int, mlir::PassInstrumentor*, mlir::PassInstrumentation::PipelineParentInfo const*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43642aa)
+#15 0x0000563069fadc3c mlir::detail::OpToOpPassAdaptor::runOnOperationAsyncImpl(bool)::'lambda'(mlir::detail::OpToOpPassAdaptor::runOnOperationAsyncImpl(bool)::OpPMInfo&)::operator()(mlir::detail::OpToOpPassAdaptor::runOnOperationAsyncImpl(bool)::OpPMInfo&) const Pass.cpp:0:0
+#16 0x0000563069fac425 mlir::detail::OpToOpPassAdaptor::runOnOperationAsyncImpl(bool) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4363425)
+#17 0x0000563069facb6a mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4363b6a)
+#18 0x0000563069fad2aa mlir::detail::OpToOpPassAdaptor::runPipeline(mlir::OpPassManager&, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int, mlir::PassInstrumentor*, mlir::PassInstrumentation::PipelineParentInfo const*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43642aa)
+#19 0x0000563069fada64 mlir::PassManager::run(mlir::Operation*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4364a64)
+#20 0x0000563069f9e823 performActions(llvm::raw_ostream&, std::shared_ptr<llvm::SourceMgr> const&, mlir::MLIRContext*, mlir::MlirOptMainConfig const&) MlirOptMain.cpp:0:0
+#21 0x0000563069f9fda4 processBuffer(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::MlirOptMainConfig const&, mlir::DialectRegistry&, llvm::ThreadPool*) MlirOptMain.cpp:0:0
+#22 0x0000563069f9ff54 mlir::LogicalResult llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>::callback_fn<mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&)::'lambda'(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>(long, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&) MlirOptMain.cpp:0:0
+#23 0x000056306a09cb04 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4453b04)
+#24 0x0000563069f983b7 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x434f3b7)
+#25 0x0000563069fa00a1 mlir::MlirOptMain(int, char**, llvm::StringRef, llvm::StringRef, mlir::DialectRegistry&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43570a1)
+#26 0x0000563069fa0526 mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4357526)
+#27 0x000056306716c04b main (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x152304b)
+#28 0x00007f7a736bd083 __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24083)
+#29 0x00005630671de71e _start (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x159571e)
+Aborted (core dumped)

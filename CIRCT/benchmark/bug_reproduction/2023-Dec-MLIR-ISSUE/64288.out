@@ -1,0 +1,45 @@
+// /home/yqiu054/circt/llvm/build/bin/mlir-opt --generate-runtime-verification --vp-counters-per-site=1 "--gpu-to-llvm=use-bare-pointers-for-host use-bare-pointers-for-kernels" 64288.mlir > 64288.out
+
+
+64288.mlir:16:14: error: 'memref.alloca_scope' op expects region #0 to have 0 or 1 blocks
+      %139 = memref.alloca_scope  -> (index) {
+             ^
+64288.mlir:16:14: note: see current operation: 
+%71 = "memref.alloca_scope"() ({
+  %73 = "llvm.extractvalue"(%21) <{position = array<i64: 0>}> : (!llvm.struct<(ptr, ptr, i64, array<2 x i64>, array<2 x i64>)>) -> !llvm.ptr
+  %74 = "llvm.extractvalue"(%21) <{position = array<i64: 1>}> : (!llvm.struct<(ptr, ptr, i64, array<2 x i64>, array<2 x i64>)>) -> !llvm.ptr
+  %75 = "llvm.mlir.undef"() : () -> !llvm.struct<(ptr, ptr, i64)>
+  %76 = "llvm.insertvalue"(%75, %73) <{position = array<i64: 0>}> : (!llvm.struct<(ptr, ptr, i64)>, !llvm.ptr) -> !llvm.struct<(ptr, ptr, i64)>
+  %77 = "llvm.insertvalue"(%76, %74) <{position = array<i64: 1>}> : (!llvm.struct<(ptr, ptr, i64)>, !llvm.ptr) -> !llvm.struct<(ptr, ptr, i64)>
+  %78 = "llvm.mlir.constant"() <{value = 0 : index}> : () -> i64
+  %79 = "llvm.insertvalue"(%77, %78) <{position = array<i64: 2>}> : (!llvm.struct<(ptr, ptr, i64)>, i64) -> !llvm.struct<(ptr, ptr, i64)>
+  %80 = "llvm.extractvalue"(%21) <{position = array<i64: 2>}> : (!llvm.struct<(ptr, ptr, i64, array<2 x i64>, array<2 x i64>)>) -> i64
+  %81 = "llvm.extractvalue"(%21) <{position = array<i64: 3, 0>}> : (!llvm.struct<(ptr, ptr, i64, array<2 x i64>, array<2 x i64>)>) -> i64
+  %82 = "llvm.extractvalue"(%21) <{position = array<i64: 3, 1>}> : (!llvm.struct<(ptr, ptr, i64, array<2 x i64>, array<2 x i64>)>) -> i64
+  %83 = "llvm.extractvalue"(%21) <{position = array<i64: 4, 0>}> : (!llvm.struct<(ptr, ptr, i64, array<2 x i64>, array<2 x i64>)>) -> i64
+  %84 = "llvm.extractvalue"(%21) <{position = array<i64: 4, 1>}> : (!llvm.struct<(ptr, ptr, i64, array<2 x i64>, array<2 x i64>)>) -> i64
+  %85 = "llvm.mlir.constant"() <{value = 0 : index}> : () -> i64
+  %86 = "llvm.icmp"(%80, %85) <{predicate = 0 : i64}> : (i64, i64) -> i1
+  "llvm.cond_br"(%86)[^bb1, ^bb3] <{operandSegmentSizes = array<i32: 1, 0, 0>}> : (i1) -> ()
+^bb1:  // pred: ^bb0
+  %87 = "llvm.mlir.constant"() <{value = 1 : index}> : () -> i64
+  %88 = "llvm.icmp"(%84, %87) <{predicate = 0 : i64}> : (i64, i64) -> i1
+  "llvm.cond_br"(%88)[^bb2, ^bb4] <{operandSegmentSizes = array<i32: 1, 0, 0>}> : (i1) -> ()
+^bb2:  // pred: ^bb1
+  %89 = "memref.realloc"(%50) : (memref<?xi1>) -> memref<19xi1>
+  %90 = "llvm.mlir.constant"() <{value = 0 : index}> : () -> i64
+  %91 = "builtin.unrealized_conversion_cast"(%90) : (i64) -> index
+  "memref.alloca_scope.return"(%91) : (index) -> ()
+^bb3:  // pred: ^bb0
+  %92 = "llvm.mlir.addressof"() <{global_name = @assert_msg}> : () -> !llvm.ptr
+  %93 = "llvm.getelementptr"(%92) <{elem_type = !llvm.array<154 x i8>, rawConstantIndices = array<i32: 0>}> : (!llvm.ptr) -> !llvm.ptr
+  "llvm.call"(%93) <{CConv = #llvm.cconv<ccc>, callee = @puts, callee_type = !llvm.func<void (ptr)>, fastmathFlags = #llvm.fastmath<none>}> : (!llvm.ptr) -> ()
+  "llvm.call"() <{CConv = #llvm.cconv<ccc>, callee = @abort, callee_type = !llvm.func<void ()>, fastmathFlags = #llvm.fastmath<none>}> : () -> ()
+  "llvm.unreachable"() : () -> ()
+^bb4:  // pred: ^bb1
+  %94 = "llvm.mlir.addressof"() <{global_name = @assert_msg_0}> : () -> !llvm.ptr
+  %95 = "llvm.getelementptr"(%94) <{elem_type = !llvm.array<163 x i8>, rawConstantIndices = array<i32: 0>}> : (!llvm.ptr) -> !llvm.ptr
+  "llvm.call"(%95) <{CConv = #llvm.cconv<ccc>, callee = @puts, callee_type = !llvm.func<void (ptr)>, fastmathFlags = #llvm.fastmath<none>}> : (!llvm.ptr) -> ()
+  "llvm.call"() <{CConv = #llvm.cconv<ccc>, callee = @abort, callee_type = !llvm.func<void ()>, fastmathFlags = #llvm.fastmath<none>}> : () -> ()
+  "llvm.unreachable"() : () -> ()
+}) : () -> index

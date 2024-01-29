@@ -1,0 +1,37 @@
+// /home/yqiu054/circt/llvm/build/bin/mlir-opt --sroa 73532.mlir > 73532.out
+
+
+mlir-opt: /home/yqiu054/circt/llvm/mlir/lib/Dialect/LLVMIR/IR/LLVMMemorySlot.cpp:371: bool mlir::LLVM::GEPOp::canRewire(const mlir::DestructurableMemorySlot&, llvm::SmallPtrSetImpl<mlir::Attribute>&, llvm::SmallVectorImpl<mlir::MemorySlot>&): Assertion `slot.elementPtrs.contains(firstLevelIndex)' failed.
+PLEASE submit a bug report to https://github.com/llvm/llvm-project/issues/ and include the crash backtrace.
+Stack dump:
+0.      Program arguments: /home/yqiu054/circt/llvm/build/bin/mlir-opt --sroa 73532.mlir
+ #0 0x00005594893e7daf llvm::sys::PrintStackTrace(llvm::raw_ostream&, int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x15c5daf)
+ #1 0x00005594893e4e04 SignalHandler(int) Signals.cpp:0:0
+ #2 0x00007face19e4420 __restore_rt (/lib/x86_64-linux-gnu/libpthread.so.0+0x14420)
+ #3 0x00007face14b100b raise (/lib/x86_64-linux-gnu/libc.so.6+0x4300b)
+ #4 0x00007face1490859 abort (/lib/x86_64-linux-gnu/libc.so.6+0x22859)
+ #5 0x00007face1490729 (/lib/x86_64-linux-gnu/libc.so.6+0x22729)
+ #6 0x00007face14a1fd6 (/lib/x86_64-linux-gnu/libc.so.6+0x33fd6)
+ #7 0x000055948a498128 mlir::LLVM::GEPOp::canRewire(mlir::DestructurableMemorySlot const&, llvm::SmallPtrSetImpl<mlir::Attribute>&, llvm::SmallVectorImpl<mlir::MemorySlot>&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x2676128)
+ #8 0x000055948a3da3b3 mlir::detail::DestructurableAccessorOpInterfaceInterfaceTraits::Model<mlir::LLVM::GEPOp>::canRewire(mlir::detail::DestructurableAccessorOpInterfaceInterfaceTraits::Concept const*, mlir::Operation*, mlir::DestructurableMemorySlot const&, llvm::SmallPtrSetImpl<mlir::Attribute>&, llvm::SmallVectorImpl<mlir::MemorySlot>&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x25b83b3)
+ #9 0x000055948c1dfbb1 computeDestructuringInfo(mlir::DestructurableMemorySlot&) SROA.cpp:0:0
+#10 0x000055948c1e2468 mlir::tryToDestructureMemorySlots(llvm::ArrayRef<mlir::DestructurableAllocationOpInterface>, mlir::RewriterBase&, mlir::SROAStatistics) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43c0468)
+#11 0x000055948c1e27a4 mlir::SROAPattern::matchAndRewrite(mlir::DestructurableAllocationOpInterface, mlir::PatternRewriter&) const (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43c07a4)
+#12 0x000055948e3b3c20 mlir::PatternApplicator::matchAndRewrite(mlir::Operation*, mlir::PatternRewriter&, llvm::function_ref<bool (mlir::Pattern const&)>, llvm::function_ref<void (mlir::Pattern const&)>, llvm::function_ref<mlir::LogicalResult (mlir::Pattern const&)>) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x6591c20)
+#13 0x000055948c23a39f (anonymous namespace)::GreedyPatternRewriteDriver::processWorklist() GreedyPatternRewriteDriver.cpp:0:0
+#14 0x000055948c23d23b mlir::applyPatternsAndFoldGreedily(mlir::Region&, mlir::FrozenRewritePatternSet const&, mlir::GreedyRewriteConfig, bool*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x441b23b)
+#15 0x000055948c1df3b4 (anonymous namespace)::SROA::runOnOperation() SROA.cpp:0:0
+#16 0x000055948c185dce mlir::detail::OpToOpPassAdaptor::run(mlir::Pass*, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4363dce)
+#17 0x000055948c1862aa mlir::detail::OpToOpPassAdaptor::runPipeline(mlir::OpPassManager&, mlir::Operation*, mlir::AnalysisManager, bool, unsigned int, mlir::PassInstrumentor*, mlir::PassInstrumentation::PipelineParentInfo const*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43642aa)
+#18 0x000055948c186a64 mlir::PassManager::run(mlir::Operation*) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4364a64)
+#19 0x000055948c177823 performActions(llvm::raw_ostream&, std::shared_ptr<llvm::SourceMgr> const&, mlir::MLIRContext*, mlir::MlirOptMainConfig const&) MlirOptMain.cpp:0:0
+#20 0x000055948c178da4 processBuffer(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::MlirOptMainConfig const&, mlir::DialectRegistry&, llvm::ThreadPool*) MlirOptMain.cpp:0:0
+#21 0x000055948c178f54 mlir::LogicalResult llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>::callback_fn<mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&)::'lambda'(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>(long, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&) MlirOptMain.cpp:0:0
+#22 0x000055948c275b04 mlir::splitAndProcessBuffer(std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::function_ref<mlir::LogicalResult (std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, llvm::raw_ostream&)>, llvm::raw_ostream&, bool, bool) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4453b04)
+#23 0x000055948c1713b7 mlir::MlirOptMain(llvm::raw_ostream&, std::unique_ptr<llvm::MemoryBuffer, std::default_delete<llvm::MemoryBuffer>>, mlir::DialectRegistry&, mlir::MlirOptMainConfig const&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x434f3b7)
+#24 0x000055948c1790a1 mlir::MlirOptMain(int, char**, llvm::StringRef, llvm::StringRef, mlir::DialectRegistry&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x43570a1)
+#25 0x000055948c179526 mlir::MlirOptMain(int, char**, llvm::StringRef, mlir::DialectRegistry&) (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x4357526)
+#26 0x000055948934504b main (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x152304b)
+#27 0x00007face1492083 __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x24083)
+#28 0x00005594893b771e _start (/home/yqiu054/circt/llvm/build/bin/mlir-opt+0x159571e)
+Aborted (core dumped)
