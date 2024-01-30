@@ -1,0 +1,19 @@
+Jiyuan stop at 64075
+
+- 64067: not reproduced; seemed that the compilation option was changed
+- 64069: not reproduced; seemed that the compilation option was changed
+- 64070: errors; but different from the ones in the issue
+- 64071: reproduced
+- 64074: crashes; but different from the ones in the issue
+- 64075: errors; but different from the ones in the issue
+- 64288: errors; but different from the ones in the issue
+- 73191: reproduced
+- 73285: reproduced
+- 73381: reproduced
+- 73532: reproduced
+- 73534: crashes; but different from the ones in the issue
+- 74234: reproduced
+- 74236: reproduced
+- 74301: reproduced
+- 74313: no crashes or errors
+- 74465: reproduced

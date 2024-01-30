@@ -1,4 +1,4 @@
-//mlir-opt "-sparse-compiler=enable-runtime-library=false vl=2 reassociate-fp-reductions=true" temp.mlir
+//mlir-opt "-sparsifier=enable-runtime-library=false vl=2 reassociate-fp-reductions=true" temp.mlir
 module {
   func.func @func1(%arg0: memref<26xi1>, %arg1: vector<12x26xi1>) -> memref<?x?x?xi1> {
     %c17 = arith.constant 17 : index
