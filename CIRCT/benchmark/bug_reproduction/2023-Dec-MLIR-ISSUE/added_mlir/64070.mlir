@@ -3,6 +3,7 @@ module {
   func.func @func1(%arg0: vector<23x23xi1>, %arg1: f32, %arg2: f32) -> memref<23x23xf16> {
     %c9777_i16 = arith.constant 9777 : i16
     %c-3527_i16 = arith.constant -3527 : i16
+    %c2 = arith.constant 2 : index
     %18 = index.ceildivu %c2, %c2
     %28 = index.ceildivu %c2, %c2
     %43 = index.sizeof
@@ -16,7 +17,6 @@ module {
     %c6 = arith.constant 6 : index
     %alloc_9 = memref.alloc(%c0, %c2, %c2) : memref<?x?x?xi16>
     %53 = tensor.empty(%c2, %c2, %c2) : tensor<?x?x?x24xi16>
-    %c2 = arith.constant 2 : index
     %c3 = arith.constant 3 : index
     %c12 = arith.constant 12 : index
     %c14 = arith.constant 14 : index

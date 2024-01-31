@@ -1,5 +1,14 @@
 //~/circt/llvm/build/bin/mlir-opt --canonicalize 74301.mlir
 func.func private @func2() {
+  %cst_1 = arith.constant dense<23> : vector<15xindex>
+  %cst_2 = arith.constant dense<false> : vector<15xi1>
+  %cst_3 = arith.constant 1.000000e+00 : f16
+  %cst_4 = arith.constant dense<23> : vector<15xindex>
+  %cst_5 = arith.constant dense<false> : vector<15xi1>
+  %cst_6 = arith.constant 1.000000e+00 : f16
+  %cst_7 = arith.constant dense<23> : vector<15xindex>
+  %cst_8 = arith.constant dense<false> : vector<15xi1>
+  %cst_9 = arith.constant 1.000000e+00 : f16
   %cst_12 = arith.constant dense<23> : vector<15xindex>
   %cst_13 = arith.constant dense<false> : vector<15xi1>
   %cst_18 = arith.constant 1.000000e+00 : f16

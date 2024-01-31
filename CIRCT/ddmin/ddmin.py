@@ -136,11 +136,11 @@ def extract_error_type(output):
 def verilog_execute(code: str) -> (bool, str):
     verilog_filename = unique_ordered_elements(sv_name_pattern.findall(code))
     if len(verilog_filename) == 0:
-        print("no .sv name specified")
-        print("Warning: using name of the module to find generated .sv file. May introduce bugs")
+        #print("no .sv name specified")
+        #print("Warning: using name of the module to find generated .sv file. May introduce bugs")
         verilog_filename = unique_ordered_elements(sv_possible_name_pattern.findall(code))
     if len(verilog_filename) == 0:
-        print("no .sv file generated")
+        #print("no .sv file generated")
         return False, "no .sv file generated"
 
     try:
@@ -192,12 +192,12 @@ def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) 
     valid_compiler_variants = []
     verilog_filename = unique_ordered_elements(sv_name_pattern.findall(code))
     if len(verilog_filename) == 0:
-        print("no .sv name specified")
-        print("Warning: using name of the module to find generated .sv file. May introduce bugs")
+        #print("no .sv name specified")
+        #print("Warning: using name of the module to find generated .sv file. May introduce bugs")
         matches = sv_possible_name_pattern.findall(code)
         verilog_filename = unique_ordered_elements(match[0] if match[0] else match[1] for match in matches)
-    if len(verilog_filename) == 0:
-        print("no .sv file generated")
+    # if len(verilog_filename) == 0:
+        # print("no .sv file generated")
 
     if initial_error is not None:
         original_error = initial_error  # assign initial error to this round as the flag

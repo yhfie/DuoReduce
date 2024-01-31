@@ -1,7 +1,7 @@
-tmp/tmp62947439.mlir:2:3: remark: Testing function
+tmp/tmp27312417.mlir:2:3: remark: Testing function
   func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
   ^
-tmp/tmp62947439.mlir:2:3: note: see current operation: 
+tmp/tmp27312417.mlir:2:3: note: see current operation: 
 func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
   %c2 = arith.constant 2 : index
   %0 = index.ceildivu %c2, %c2
