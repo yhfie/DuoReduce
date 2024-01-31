@@ -1,4 +1,4 @@
-//mlir-opt --buffer-deallocation a.mlir
+//~/circt/llvm/build/bin/mlir-opt --buffer-deallocation a.mlir
 llvm.func @malloc(i64) -> !llvm.ptr
 func.func @func1(%arg0: memref<15x32x15xi1>, %arg1: i1, %arg2: tensor<13x13xf16>) -> vector<13x13xi32> {
     %c1 = arith.constant 1 : index

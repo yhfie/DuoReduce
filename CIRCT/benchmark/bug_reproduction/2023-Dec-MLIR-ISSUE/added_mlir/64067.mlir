@@ -1,4 +1,4 @@
-//mlir-opt -sparse-compiler=vl=8 temp.mlir
+//mlir-opt --sparsifier=vl=8 temp.mlir
 module {
   func.func private @func1(%arg0: tensor<?xf16>) { 
     %c9777_i16 = arith.constant 9777 : i16

@@ -1,4 +1,5 @@
 //~/circt/llvm/build/bin/mlir-opt --canonicalize 74301.mlir
+//not crash, but reduce to 0
 func.func private @func2() {
   %cst_1 = arith.constant dense<23> : vector<15xindex>
   %cst_2 = arith.constant dense<false> : vector<15xi1>

@@ -1,4 +1,4 @@
-//mlir-opt --generate-runtime-verification --vp-counters-per-site=1 "--gpu-to-llvm=use-bare-pointers-for-host use-bare-pointers-for-kernels" temp.mlir
+//~/circt/llvm/build/bin/mlir-opt --generate-runtime-verification --vp-counters-per-site=1 "--gpu-to-llvm=use-bare-pointers-for-host use-bare-pointers-for-kernels" temp.mlir
 module {
   func.func private @func2(%arg0: tensor<8x32xi32>, %arg1: vector<8x32xi1>, %arg2: vector<32x16xf16>) -> memref<32x16xf32> {
     %c1 = arith.constant 1 : index
@@ -56,7 +56,6 @@ module {
     %alloc_13 = memref.alloc() : memref<32x16xf32>
     %alloc_14 = memref.alloc() : memref<32x16xf32>
     %alloc_15 = memref.alloc() : memref<32x16xf32>
-    %alloc_16 = memref.alloc() : memref<32x16xf32>
     %alloc_21 = memref.alloc() : memref<32x16xf32>
     %alloc_23 = memref.alloc() : memref<32x16xf32>
     %alloc_24 = memref.alloc() : memref<32x16xf32>

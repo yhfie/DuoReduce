@@ -1,4 +1,4 @@
-//mlir-opt --int-range-optimizations a.mlir
+//mlir-opt --canonicalize a.mlir
 llvm.func @malloc(i64) -> !llvm.ptr
 func.func @func2(%arg0: index, %arg1: memref<13x13xi64>, %arg2: index) {
   %cst_7 = arith.constant dense<1526248407> : vector<1xi64>
