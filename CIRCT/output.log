@@ -1,44 +1,6 @@
-tmp/tmp27312417.mlir:2:3: remark: Testing function
-  func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
-  ^
-tmp/tmp27312417.mlir:2:3: note: see current operation: 
-func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
-  %c2 = arith.constant 2 : index
-  %0 = index.ceildivu %c2, %c2
-  %1 = index.sizeof
-  %2 = index.divs %c2, %c2
-  %3 = affine.apply affine_map<(d0, d1, d2, d3) -> (d0 - 16)>(%2, %0, %c2, %1)
-  scf.index_switch %3 
-  default {
-    %4 = scf.index_switch %c2 -> memref<23x8xi1> 
-    default {
-      %5 = tensor.empty() : tensor<7xi16>
-      %6 = tensor.empty() : tensor<i16>
-      %alloc = memref.alloc() : memref<23x8xi1>
-      scf.yield %alloc : memref<23x8xi1>
-    }
-  }
-  return
-}
-#map = affine_map<(d0, d1, d2, d3) -> (d0 - 16)>
 module {
-  func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
-    %c2 = arith.constant 2 : index
-    %0 = index.ceildivu %c2, %c2
-    %1 = index.sizeof
-    %2 = index.divs %c2, %c2
-    %3 = affine.apply #map(%2, %0, %c2, %1)
-    scf.index_switch %3 
-    default {
-      %4 = scf.index_switch %c2 -> memref<23x8xi1> 
-      default {
-        %5 = tensor.empty() : tensor<7xi16>
-        %6 = tensor.empty() : tensor<i16>
-        %alloc = memref.alloc() : memref<23x8xi1>
-        scf.yield %alloc : memref<23x8xi1>
-      }
-    }
-    return
+  llvm.func @omp_target() {
+    llvm.return
   }
 }
 
