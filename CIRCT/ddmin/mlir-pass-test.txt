@@ -1,1 +1,1 @@
-(test-diagnostic-filter{filters=mysource1})
+(sparsifier{vl=8})

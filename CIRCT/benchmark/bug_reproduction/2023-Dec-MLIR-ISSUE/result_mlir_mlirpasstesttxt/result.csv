@@ -1,7 +1,9 @@
 ID,LOC (before),LOC (after),Reduction Ratio
+64067 -> not right, not right version
 64071,35,21,0.40
 64074,33,10,0.70
 64075,21,80,-2.81
+64288 -> not right, need script
 73191,105,1076,-9.25
 73285,222,486,-1.19
 73381,29,58,-1.00
@@ -9,7 +11,7 @@ ID,LOC (before),LOC (after),Reduction Ratio
 73534,25,85,-2.40
 74234,22,91,-3.14
 74236,35,7,0.80
-74301,31,18,0.42
+74301,31,18,0.42 -> not right, not right version
 74313,28,161,-4.75
-74465,16,18,-0.12
+74465,16,18,-0.12 -> not right, need script
 76579,39,7,0.82
