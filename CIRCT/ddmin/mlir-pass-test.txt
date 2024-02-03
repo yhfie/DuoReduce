@@ -1,7 +1,1 @@
-convert-vector-to-llvm
-finalize-memref-to-llvm
-convert-arith-to-llvm
-convert-openmp-to-llvm
-convert-cf-to-llvm
-int-range-optimizations
-canonicalize
+(test-diagnostic-filter{filters=mysource1})

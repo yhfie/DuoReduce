@@ -1,9 +1,0 @@
-// /home/yqiu054/circt/llvm/build/bin/mlir-opt -test-vector-unrolling-patterns=unroll-based-on-type 64075.mlir > 64075.out
-
-
-64075.mlir:7:36: error: custom op 'vector.multi_reduction' expected ::mlir::vector::CombiningKind to be one of: add, mul, minui, minsi, minnumf, maxui, maxsi, maxnumf, and, or, xor, maximumf, minimumf
-    %115 = vector.multi_reduction <minf>, %24, %cst_1 [0, 1] : vector<6x8xf32> to f32
-                                   ^
-64075.mlir:7:40: error: custom op 'vector.multi_reduction' failed to parse Vector_CombiningKindAttr parameter 'value' which is to be a `::mlir::vector::CombiningKind`
-    %115 = vector.multi_reduction <minf>, %24, %cst_1 [0, 1] : vector<6x8xf32> to f32
-                                       ^

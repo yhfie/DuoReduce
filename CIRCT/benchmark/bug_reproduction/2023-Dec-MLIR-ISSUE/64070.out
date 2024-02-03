@@ -1,4 +1,0 @@
-/home/yqiu054/circt/llvm/build/bin/mlir-opt --test-written-to 64070.mlir
-64070.mlir:14:22: error: expected ':'
-      scf.reduce(%131)  : tensor<14xi64> {
-                     ^

@@ -1,9 +1,0 @@
-// /home/yqiu054/circt/llvm/build/bin/mlir-opt --canonicalize 74313.mlir > 74313.out
-
-
-module {
-  func.func private @func2() {
-    return
-  }
-}
-

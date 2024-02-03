@@ -1,9 +1,9 @@
 dependency: {}
-passed compiler: [['convert-vector-to-llvm', 'finalize-memref-to-llvm', 'convert-arith-to-llvm', 'convert-openmp-to-llvm', 'convert-cf-to-llvm', 'int-range-optimizations', 'canonicalize'], ['convert-vector-to-llvm', 'finalize-memref-to-llvm', 'convert-arith-to-llvm', 'convert-openmp-to-llvm', 'convert-cf-to-llvm', 'int-range-optimizations'], ['convert-vector-to-llvm', 'finalize-memref-to-llvm', 'convert-arith-to-llvm', 'convert-openmp-to-llvm', 'convert-cf-to-llvm'], ['convert-vector-to-llvm', 'finalize-memref-to-llvm', 'convert-arith-to-llvm', 'convert-openmp-to-llvm'], ['convert-vector-to-llvm', 'finalize-memref-to-llvm', 'convert-arith-to-llvm'], ['convert-vector-to-llvm', 'finalize-memref-to-llvm'], ['convert-vector-to-llvm']]
+passed compiler: [['canonicalize']]
 initial error: True
 valid and unique compilation path: 0
 valid and unique compilation path: []
-Execution time: 0.23582983016967773 seconds
+Execution time: 0.0643911361694336 seconds
 initial flag: (False, 'no valid compiler')
 k: 1
 pass test!

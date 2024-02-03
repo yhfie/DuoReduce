@@ -1,6 +1,0 @@
-// https://github.com/llvm/llvm-project/issues/64067
-// /home/yqiu054/circt/llvm/build/bin/mlir-opt -sparse-compiler=vl=8 64067.mlir > 64067.out
-
-
-mlir-opt: Unknown command line argument '-sparse-compiler=vl=8'.  Try: '/home/yqiu054/circt/llvm/build/bin/mlir-opt --help'
-mlir-opt: Did you mean '--sparsifier=vl=8'?
