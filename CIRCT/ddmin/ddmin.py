@@ -4,6 +4,8 @@ from typing import List
 
 from dependency import find_dependency as quick_find
 
+import cut
+
 output_log_file = "output.log"
 
 exe_round = 1
@@ -136,11 +138,11 @@ def extract_error_type(output):
 def verilog_execute(code: str) -> (bool, str):
     verilog_filename = unique_ordered_elements(sv_name_pattern.findall(code))
     if len(verilog_filename) == 0:
-        #print("no .sv name specified")
-        #print("Warning: using name of the module to find generated .sv file. May introduce bugs")
+        # print("no .sv name specified")
+        # print("Warning: using name of the module to find generated .sv file. May introduce bugs")
         verilog_filename = unique_ordered_elements(sv_possible_name_pattern.findall(code))
     if len(verilog_filename) == 0:
-        #print("no .sv file generated")
+        # print("no .sv file generated")
         return False, "no .sv file generated"
 
     try:
@@ -192,12 +194,12 @@ def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) 
     valid_compiler_variants = []
     verilog_filename = unique_ordered_elements(sv_name_pattern.findall(code))
     if len(verilog_filename) == 0:
-        #print("no .sv name specified")
-        #print("Warning: using name of the module to find generated .sv file. May introduce bugs")
+        # print("no .sv name specified")
+        # print("Warning: using name of the module to find generated .sv file. May introduce bugs")
         matches = sv_possible_name_pattern.findall(code)
         verilog_filename = unique_ordered_elements(match[0] if match[0] else match[1] for match in matches)
     # if len(verilog_filename) == 0:
-        # print("no .sv file generated")
+    # print("no .sv file generated")
 
     if initial_error is not None:
         original_error = initial_error  # assign initial error to this round as the flag
@@ -207,7 +209,8 @@ def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) 
     start_time = time.time()
     # Figure out the dependency graph if it is the first execution
     if exe_round == 1:
-        dependency_graph, original_error, compiler_variants = quick_find(execute_compiler, PASS_PHASES, mlir_name=MLIR_filename)
+        dependency_graph, original_error, compiler_variants = quick_find(execute_compiler, PASS_PHASES,
+                                                                         mlir_name=MLIR_filename)
         print("dependency:", dependency_graph)
         print("passed compiler:", compiler_variants)
         print("initial error:", original_error)
@@ -222,7 +225,7 @@ def test_ir_code(code: str, initial_error: str = None, verilog_execution=False) 
 
     # If not, use our own oracle
 
-    for compiler in compiler_variants:      # In each round, dynamically figure out the valid compilation pass
+    for compiler in compiler_variants:  # In each round, dynamically figure out the valid compilation pass
         if (exe_round == 1) and (original_error != "True"):  # avoid repetitive execution for round 1
             if (len(valid_compiler_variants) >= 1) and (len(compiler) < len(valid_compiler_variants[0])):  # save
                 # the possible shortest faulty compilation to localize fault, since the compilation is not correct
@@ -335,16 +338,31 @@ def ddmin_ir(code: str) -> str:
     initial_flag = test_ir_code(code)
     print("initial flag:", initial_flag)
     global exe_round
-    syptom_keep_flag = True
+    symptom_keep_flag = True
     exe_round = exe_round + 1
-    while syptom_keep_flag:
-        part_result, syptom_keep_flag = minimize(minimized_code_lines, initial_flag=initial_flag)
+    while symptom_keep_flag:
+        part_result, symptom_keep_flag = minimize(minimized_code_lines, initial_flag=initial_flag)
         if len(part_result) < len(minimized_code_lines):
             minimized_code_lines = copy.deepcopy(part_result)
         exe_round = exe_round + 1
+        if not symptom_keep_flag:
+            code_size = len(minimized_code_lines)
+            print("Fixed point reached. Try to cut. Now the length is:", code_size)
+            code_candidates = cut.cut_entry(minimized_code_lines)
+            for code_candidate in code_candidates:
+                part_result, symptom_keep_flag = minimize(code_candidate, initial_flag=initial_flag)
+                if len(part_result) < len(minimized_code_lines):
+                    minimized_code_lines = copy.deepcopy(part_result)
+            print("Cut. The code size is: ", len(minimized_code_lines))
+            symptom_keep_flag = True
+            if len(minimized_code_lines) >= code_size:
+                print("OK...Seems cut also cannot solve the problem.")
+                symptom_keep_flag = False
 
     return '\n'.join(minimized_code_lines)
 
+
+# TODO: UnTested
 
 if __name__ == '__main__':
     # Example usage:

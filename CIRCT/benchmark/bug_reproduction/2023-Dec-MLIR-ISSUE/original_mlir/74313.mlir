@@ -1,7 +1,7 @@
 //mlir-opt --canonicalize a.mlir
 func.func private @func2() {
   %c8 = arith.constant 8 : index
-  %c25 = arith.constant 25 : index
+  %c25 = arith.constant 5 : index
   %alloc_15 = memref.alloc(%c25) {alignment = 64 : i64} : memref<?x3xf16>
   %10 = bufferization.to_tensor %alloc_15 : memref<?x3xf16>
   %13 = memref.alloca_scope  -> (memref<27xf32>) {

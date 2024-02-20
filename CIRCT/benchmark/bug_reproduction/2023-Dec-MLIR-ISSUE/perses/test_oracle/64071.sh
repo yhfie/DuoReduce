@@ -5,7 +5,7 @@ output=$(~/circt/llvm/build/bin/mlir-opt -pass-pipeline='builtin.module(func.fun
 
 # Search for "Assertion" and "Failed" in the output
 if [[ $output == *"Assertion"* && $output == *"failed"* ]]; then
-  echo 0
+  exit 1
 else
-  echo 1
+  exit 0
 fi

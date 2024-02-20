@@ -5,7 +5,7 @@ output=$(~/circt/llvm/build/bin/mlir-opt -convert-vector-to-llvm -finalize-memre
 
 # Search for "Assertion" and "Failed" in the output
 if [[ $output == *"PLEASE submit a bug report to"* ]]; then
-  exit 1
-else
   exit 0
+else
+  exit 1
 fi

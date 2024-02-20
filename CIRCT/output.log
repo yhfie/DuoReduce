@@ -1,33 +1,8 @@
-#map = affine_map<(d0, d1, d2, d3) -> (d0 - 16)>
 module {
-  func.func private @func1(%arg0: tensor<?xf16>) {
-    %c9777_i16 = arith.constant 9777 : i16
-    %c-3527_i16 = arith.constant -3527 : i16
-    %c2 = arith.constant 2 : index
-    %0 = index.ceildivu %c2, %c2
-    %1 = index.ceildivu %c2, %c2
-    %2 = index.sizeof
-    %3 = index.divs %c2, %c2
-    %4 = affine.apply #map(%3, %1, %c2, %2)
-    %cst = arith.constant 2.05639219E+9 : f32
-    %true = arith.constant true
-    %c0 = arith.constant 0 : index
-    %c5 = arith.constant 5 : index
-    %c1 = arith.constant 1 : index
-    %c6 = arith.constant 6 : index
-    %alloc = memref.alloc(%c0, %c2, %c2) : memref<?x?x?xi16>
-    %5 = tensor.empty(%c2, %c2, %c2) : tensor<?x?x?x24xi16>
-    %broadcasted = linalg.broadcast ins(%alloc : memref<?x?x?xi16>) outs(%5 : tensor<?x?x?x24xi16>) dimensions = [3] 
-    %6 = scf.index_switch %c2 -> index 
-    default {
-      %7 = memref.alloca_scope  -> (index) {
-        %alloc_0 = memref.alloc(%c2, %c2, %c2) : memref<?x?x24x?xi16>
-        linalg.transpose ins(%broadcasted : tensor<?x?x?x24xi16>) outs(%alloc_0 : memref<?x?x24x?xi16>) permutation = [2, 0, 3, 1] 
-        memref.alloca_scope.return %c2 : index
-      }
-      scf.yield %c2 : index
-    }
-    return
+  llvm.func @malloc90(i64) -> i64
+  llvm.func @malloc81(i64) -> i64
+  llvm.func @func1() attributes {sym_visibility = "nested"} {
+    llvm.return
   }
 }
 

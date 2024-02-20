@@ -11,6 +11,7 @@ llvm.func @func1() attributes {sym_visibility = "nested"} {
     %240 = llvm.getelementptr %239[0, 19] : (!llvm.ptr) -> !llvm.ptr, !llvm.array<2 x i64>
     %241 = llvm.load %240 : !llvm.ptr -> i64
     %242 = llvm.mul %241, %34  : i64
+    //%242 = arith.constant 42: i64
     %243 = llvm.mlir.zero : !llvm.ptr
     %244 = llvm.getelementptr %243[%242] : (!llvm.ptr, i64) -> !llvm.ptr, f32
     %245 = llvm.ptrtoint %244 : !llvm.ptr to i64
