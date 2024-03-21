@@ -3,7 +3,18 @@ module {
   func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
     %c9777_i16 = arith.constant 9777 : i16
     %c-3527_i16 = arith.constant -3527 : i16
-    %c2 = arith.constant 2 : index 
+    %c11 = arith.constant 11 : index
+    %c12 = arith.constant 12 : index
+    %c91 = arith.constant 91 : index
+    %c911 = arith.constant 911 : index
+    %c912 = arith.constant 912 : index
+    %com91 = index.divs %c911, %c91
+    %com92 = index.divs %c912, %c91
+    %c92 = index.divs %com91, %com92
+    %c1 = index.divs %c92, %c92
+    %com1 = index.divs %c11, %c1
+    %com2 = index.divs %c12, %c1
+    %c2 = index.divs %com1, %com2
     %18 = index.ceildivu %c2, %c2
     %28 = index.ceildivu %c2, %c2
     %43 = index.sizeof

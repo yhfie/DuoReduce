@@ -1,10 +1,6 @@
 module {
   func.func @func2(%arg0: tensor<?x?x?xi1>, %arg1: tensor<5x5xi32>) {
-    %c11 = arith.constant 11 : index
-    %c12 = arith.constant 12 : index
-    %com1 = index.divs %c11, %c11
-    %com2 = index.divs %c12, %c12
-    %c2 = index.divs %com1, %com2
+    %c2 = arith.constant 2 : index
     %28 = index.ceildivu %c2, %c2
     %43 = index.sizeof
     %46 = index.divs %c2, %c2

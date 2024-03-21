@@ -1,1 +1,1 @@
-(sroa)
+func.func(test-match-reduction)

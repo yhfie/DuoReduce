@@ -60,11 +60,12 @@ def replace_constant(operator: str, target_code_line: str) -> str:
         op_type = target_code_line[(last_colon_position + 1):]
     except:
         raise "Wrong, no ':'"
-
     if " to " in op_type:
         op_type = op_type.split(" to")[-1]
+    if "index." in target_code_line:
+        op_type = "index"
+
     for pattern, constant in Patterns:
-        print(constant)
         if re.match(pattern, op_type):
             return operator + "= arith.constant " + constant + ":" + op_type
     return target_code_line
@@ -80,6 +81,8 @@ def insert_virtual_function_def(operator: str, target_code_line: str) -> (str, s
         raise "Wrong, no ':'"
     if " to " in op_type:
         op_type = op_type.split(" to")[-1]
+    if "index." in target_code_line:
+        op_type = "index"
 
     function_name = "@malloc" + str(random.randint(0, 100))
     virtual_func_line = "llvm.func " + function_name + "(" + op_type + ")" + "->" + op_type
@@ -97,6 +100,8 @@ def insert_virtual_function_call(operator: str, target_code_line: str, function_
         raise "Wrong, no ':'"
     if " to " in op_type:
         op_type = op_type.split(" to")[-1]
+    if "index." in target_code_line:
+        op_type = "index"
 
     new_op = "%" + str(random.randint(1000, 2000))
     virtual_call_code_line = new_op + "=llvm.call " + function_name + "(" + operator + "):(" + op_type + ")" + "->" + op_type

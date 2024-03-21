@@ -302,7 +302,7 @@ def codeset_execution(code_set: List[str], initial_flag) -> (List[str], bool):
 def ddmin_ir(code: str) -> str:
     def split_code(code: List[str], n: int) -> List[List[str]]:
         k, m = divmod(len(code), n)
-        print("k:", k)
+        #print("k:", k)
         return [code[:i] + code[min(i + n, len(code)):] for i in range(len(code))]
 
     def divide_array(arr, n, flag):
@@ -321,13 +321,13 @@ def ddmin_ir(code: str) -> str:
         while len(code) >= n > 0:
             code_sets = divide_array(split_code(code, n), para, initial_flag)
             with multiprocessing.Pool(processes=min(len(code_sets), para)) as pool:
-                print("now at deletion level:", n)
+                #print("now at deletion level:", n)
                 results = pool.starmap(codeset_execution, iterable=code_sets)
             n = n - 1
 
             for result in results:
                 if result[1]:  # if codeline is too small, return False
-                    print(result[0])
+                    #print(result[0])
                     return result[0], True
         return code, False
 
@@ -349,10 +349,12 @@ def ddmin_ir(code: str) -> str:
             code_size = len(minimized_code_lines)
             print("Fixed point reached. Try to cut. Now the length is:", code_size)
             code_candidates = cut.cut_entry(minimized_code_lines)
-            for code_candidate in code_candidates:
+            for i in range(len(code_candidates)):
+                code_candidate = code_candidates[len(code_candidates)-i-1]
                 part_result, symptom_keep_flag = minimize(code_candidate, initial_flag=initial_flag)
                 if len(part_result) < len(minimized_code_lines):
                     minimized_code_lines = copy.deepcopy(part_result)
+                    break
             print("Cut. The code size is: ", len(minimized_code_lines))
             symptom_keep_flag = True
             if len(minimized_code_lines) >= code_size:

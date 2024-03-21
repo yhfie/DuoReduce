@@ -37,6 +37,9 @@ def execute_compiler(compiler_opt, compiler, mlir_name, initial_error=None) -> (
             if ("Assertion" in line) and ("failed" in line):
                 lines[0] = line
                 break
+        if ("tmp/tmp" in lines[0]) and ("error" in lines[0]):
+            last_colon_position = lines[0].rfind(':')
+            lines[0] = lines[0][last_colon_position:]
         if lines[0] == initial_error:
             valid_compiler.append(compiler)
             return True, lines[0]
