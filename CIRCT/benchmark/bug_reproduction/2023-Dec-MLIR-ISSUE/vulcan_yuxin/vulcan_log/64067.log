@@ -1,0 +1,37 @@
+[03:51:19] [INFO   ] The command-line options are: "--alg": "perses_node_priority_with_dfs_delta", "--append-to-progress-dump-file": "false", "--call-creduce": "false", "--call-formatter": "false", "--creduce-cmd": "creduce", "--default-delta-debugger-for-kleene": "DFS", "--designated-parser-facade-class-name": "", "--edit-caching": "true", "--enable-lightweight-refreshing": "false", "--enable-line-slicer": "false", "--enable-token-slicer": "false", "--enable-tree-slicer": "false", "--enable-vulcan": "true", "--fixpoint": "true", "--format-cmd": "", "--help, -h": "false", "--input-file, --input, -i": "/home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/test_oracle/64067.mlir", "--language-ext-jars": "[]", "--list-algs": "false", "--list-langs": "false", "--list-parser-facades": "false", "--list-verbosity-levels": "false", "--max-bfs-depth-for-regular-rule-node": "5", "--max-edit-count-for-regular-rule-node": "100", "--non-deletion-iteration-limit": "10", "--output-dir, -o": "/home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/vulcan_log/../reduced", "--pass-level-caching": "false", "--profile": "false", "--query-cache-refresh-threshold": "0", "--query-cache-type": "COMPACT_QUERY_CACHE", "--query-caching": "AUTO", "--reparse-each-iteration": "true", "--script-execution-keep-waiting-after-timeout": "true", "--script-execution-timeout-in-seconds": "600", "--stop-at-first-compatible-child-for-regular-rule-node": "false", "--test-script, --test, -t": "/home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/test_oracle/64067.sh", "--threads": "auto", "--verbosity": "INFO", "--version": "false", "--vulcan-fixpoint": "false", "--window-size": "4" 
+[03:51:19] [INFO   ] Tree Building: Start building spar-tree from input file SourceFile{file=FileWithContent{file=/home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/test_oracle/64067.mlir}, lang=LanguageMLIR{name=mlir, extensions=[mlir], defaultCodeFormatControl=COMPACT_ORIG_FORMAT}} 
+[03:51:19] [INFO   ] Tree Building: Step 1: Antlr parsing. 
+Exception in thread "main" org.perses.grammar.AntlrFailureException: Error in parsing file: <in memory>
+Details: recognizer: org.perses.grammar.mlir.PnfMLIRParser@38eb2c50
+offendingSymbol: [@2,5:5='=',<30>,1:5]
+line: 1
+column: 5
+msg: no viable alternative at input '#map='
+
+	at org.perses.grammar.FailOnErrorAntlrErrorListener.syntaxError(FailOnErrorAntlrErrorListener.kt:43)
+	at org.antlr.v4.runtime.ProxyErrorListener.syntaxError(ProxyErrorListener.java:41)
+	at org.antlr.v4.runtime.Parser.notifyErrorListeners(Parser.java:544)
+	at org.antlr.v4.runtime.DefaultErrorStrategy.reportNoViableAlternative(DefaultErrorStrategy.java:310)
+	at org.antlr.v4.runtime.DefaultErrorStrategy.reportError(DefaultErrorStrategy.java:136)
+	at org.perses.grammar.mlir.PnfMLIRParser.mlir_file(PnfMLIRParser.java:6612)
+	at org.perses.grammar.mlir.PnfMLIRParserFacade.startParsing(PnfMLIRParserFacade.java:36)
+	at org.perses.grammar.mlir.PnfMLIRParserFacade.startParsing(PnfMLIRParserFacade.java:13)
+	at org.perses.grammar.AbstractDefaultParserFacade$parseReader$3.apply(AbstractDefaultParserFacade.kt:70)
+	at org.perses.grammar.AbstractDefaultParserFacade$parseReader$3.apply(AbstractDefaultParserFacade.kt:65)
+	at org.perses.grammar.AbstractDefaultParserFacade$Companion.parseReader(AbstractDefaultParserFacade.kt:151)
+	at org.perses.grammar.AbstractDefaultParserFacade.parseReader(AbstractDefaultParserFacade.kt:65)
+	at org.perses.grammar.AbstractParserFacade.parseString(AbstractParserFacade.kt:97)
+	at org.perses.grammar.AbstractParserFacade.parseString$default(AbstractParserFacade.kt:95)
+	at org.perses.reduction.AbstractProgramReductionDriver$Companion.createSparTree(AbstractProgramReductionDriver.kt:640)
+	at org.perses.reduction.RegularProgramReductionDriver$Companion.create(RegularProgramReductionDriver.kt:121)
+	at org.perses.Main.createReductionDriver(Main.kt:64)
+	at org.perses.AbstractMain.internalRun(AbstractMain.kt:41)
+	at org.perses.util.cmd.AbstractMain.run(AbstractMain.kt:53)
+	at org.perses.Main$Companion.main(Main.kt:70)
+	at org.perses.Main.main(Main.kt)
+Caused by: org.antlr.v4.runtime.NoViableAltException
+	at org.antlr.v4.runtime.atn.ParserATNSimulator.noViableAlt(ParserATNSimulator.java:2014)
+	at org.antlr.v4.runtime.atn.ParserATNSimulator.execATN(ParserATNSimulator.java:445)
+	at org.antlr.v4.runtime.atn.ParserATNSimulator.adaptivePredict(ParserATNSimulator.java:371)
+	at org.perses.grammar.mlir.PnfMLIRParser.mlir_file(PnfMLIRParser.java:6593)
+	... 15 more
