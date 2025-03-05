@@ -1,6 +1,4 @@
-# DuoReduce
-<<<<<<< HEAD
-DuoReduce: Bug Isolation for Multi-Layer Extensible Compilation (FSE 2025)
+# DuoReduce: Bug Isolation for Multi-Layer Extensible Compilation (FSE 2025)
 =======
 Repo for DuoReduce. We use these programs as input to test compilers and improve the debuggability of compilers
 
@@ -48,4 +46,3 @@ It means we apply delta debugging for a.generic.mlir, with possible pass in circ
 python3 ddmin.py your.mlir your_path_to_circt-opt your_mlir_pass.txt para_number [possible_test_script.sh]
 ```
 You can add your own test oracle as a test script. It should exit 0 when it pass the oracle and exit 1 otherwise
->>>>>>> duoreduce/main
