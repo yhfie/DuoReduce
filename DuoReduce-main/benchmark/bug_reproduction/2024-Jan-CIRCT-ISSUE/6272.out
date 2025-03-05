@@ -1,0 +1,13 @@
+// https://github.com/llvm/circt/issues/6272
+
+// firtool 6272.fir > 6272.out
+6272.fir:6:5: error: 'hw.wire' op requires the same type for all operands and results
+    mem memory:
+    ^
+6272.fir:6:5: note: see current operation: %3 = "hw.wire"(%6) {name = "memory_r_data_a"} : (i1) -> !seq.clock
+
+// firtool 6272.fir -disable-all-randomization > 6272.out
+6272.fir:6:5: error: 'hw.wire' op requires the same type for all operands and results
+    mem memory:
+    ^
+6272.fir:6:5: note: see current operation: %3 = "hw.wire"(%6) {name = "memory_r_data_a"} : (i1) -> !seq.clock

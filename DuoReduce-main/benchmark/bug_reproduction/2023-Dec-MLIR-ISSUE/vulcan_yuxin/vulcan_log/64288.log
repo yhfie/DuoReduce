@@ -1,0 +1,8 @@
+Exception in thread "main" java.lang.IllegalStateException: The test script /home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/test_oracle/64288.sh is not a file. The current directory is /home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/..
+	at org.perses.cmd.InputFlagGroup.validate(InputFlagGroup.kt:51)
+	at org.perses.util.cmd.AbstractCommandOptions.validate(AbstractCommandOptions.kt:121)
+	at org.perses.util.cmd.AbstractMain.validateCommandOptions(AbstractMain.kt:67)
+	at org.perses.Main.validateCommandOptions(Main.kt:41)
+	at org.perses.util.cmd.AbstractMain.run(AbstractMain.kt:51)
+	at org.perses.Main$Companion.main(Main.kt:70)
+	at org.perses.Main.main(Main.kt)
