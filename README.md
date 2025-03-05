@@ -25,7 +25,7 @@ git submodule update --init
 ```
 ./compile_onnxmlir.sh configure
 ./compile_onnxmlir.sh build
-``
+```
 
 5. Build CIRCT:
 Check the link [here](https://circt.llvm.org/docs/GettingStarted/) 
