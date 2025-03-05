@@ -1,8 +1,6 @@
 # DuoReduce: Bug Isolation for Multi-Layer Extensible Compilation (FSE 2025)
-=======
-Repo for DuoReduce. We use these programs as input to test compilers and improve the debuggability of compilers
 
-## ONNX-MLIR based Toy Compilation Pass
+Repo for DuoReduce. We use these programs as input to test compilers and improve the debuggability of compilers
 
 ### Build
 1. Clone submodule: `git submodule update --init`
