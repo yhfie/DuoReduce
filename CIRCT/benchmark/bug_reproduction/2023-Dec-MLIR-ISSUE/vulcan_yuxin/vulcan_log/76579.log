@@ -1,0 +1,32 @@
+[03:51:38] [INFO   ] The command-line options are: "--alg": "perses_node_priority_with_dfs_delta", "--append-to-progress-dump-file": "false", "--call-creduce": "false", "--call-formatter": "false", "--creduce-cmd": "creduce", "--default-delta-debugger-for-kleene": "DFS", "--designated-parser-facade-class-name": "", "--edit-caching": "true", "--enable-lightweight-refreshing": "false", "--enable-line-slicer": "false", "--enable-token-slicer": "false", "--enable-tree-slicer": "false", "--enable-vulcan": "true", "--fixpoint": "true", "--format-cmd": "", "--help, -h": "false", "--input-file, --input, -i": "/home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/test_oracle/76579.mlir", "--language-ext-jars": "[]", "--list-algs": "false", "--list-langs": "false", "--list-parser-facades": "false", "--list-verbosity-levels": "false", "--max-bfs-depth-for-regular-rule-node": "5", "--max-edit-count-for-regular-rule-node": "100", "--non-deletion-iteration-limit": "10", "--output-dir, -o": "/home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/vulcan_log/../reduced", "--pass-level-caching": "false", "--profile": "false", "--query-cache-refresh-threshold": "0", "--query-cache-type": "COMPACT_QUERY_CACHE", "--query-caching": "AUTO", "--reparse-each-iteration": "true", "--script-execution-keep-waiting-after-timeout": "true", "--script-execution-timeout-in-seconds": "600", "--stop-at-first-compatible-child-for-regular-rule-node": "false", "--test-script, --test, -t": "/home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/test_oracle/76579.sh", "--threads": "auto", "--verbosity": "INFO", "--version": "false", "--vulcan-fixpoint": "false", "--window-size": "4" 
+[03:51:39] [INFO   ] Tree Building: Start building spar-tree from input file SourceFile{file=FileWithContent{file=/home/yqiu054/MLIR-s-benchmark/CIRCT/benchmark/bug_reproduction/2023-Dec-MLIR-ISSUE/vulcan_yuxin/test_oracle/76579.mlir}, lang=LanguageMLIR{name=mlir, extensions=[mlir], defaultCodeFormatControl=COMPACT_ORIG_FORMAT}} 
+[03:51:39] [INFO   ] Tree Building: Step 1: Antlr parsing. 
+[03:51:39] [INFO   ] Tree Building: Step 2: Converting parse tree to spar-tree 
+[03:51:39] [INFO   ] Tree Building: Step 3: Simplifying spar-tree 
+[03:51:39] [INFO   ] Tree Building: Finished in TimeSpan{startMillis=1720065099500, endMillis=1720065099774, formatted=0 seconds} 
+[03:51:39] [INFO   ] The reduction process started at 03:51:39 2024/07/04 
+[03:51:39] [INFO   ] Cache setting: query-caching=disabled, edit-caching=enabled, query-cache=compact_query_cache 
+[03:51:40] [INFO   ] The initial sanity check failed. 
+[03:51:40] [INFO   ] Checking whether the script is flaky. #trials=5 
+Exception in thread "main" java.lang.IllegalStateException: The initial sanity check failed. 
+
+***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** *****
+*
+* The script exit code is ExitCode(intValue=1) 
+* The files have been saved, and you can check them at:
+*     /tmp/perses_failure_12104527296573584765
+* The property test is not flaky. #total runs: 6, #interesting: 0, #uninteresting: 6
+***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** ***** *****
+
+============= stderr =============
+<empty>
+
+============= stdout =============
+<empty> 
+
+	at org.perses.reduction.AbstractReductionDriver.sanityCheck(AbstractReductionDriver.kt:93)
+	at org.perses.reduction.AbstractProgramReductionDriver.reduce(AbstractProgramReductionDriver.kt:188)
+	at org.perses.AbstractMain.internalRun(AbstractMain.kt:41)
+	at org.perses.util.cmd.AbstractMain.run(AbstractMain.kt:53)
+	at org.perses.Main$Companion.main(Main.kt:70)
+	at org.perses.Main.main(Main.kt)
