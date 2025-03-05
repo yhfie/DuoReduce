@@ -1,4 +1,0 @@
-"builtin.module"() ({
-  "func.func"()
-       () -> ()
-}) : () -> ()

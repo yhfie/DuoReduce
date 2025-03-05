@@ -35,11 +35,13 @@ The ddmin main algorithm and compilation dependency-aware algorithm are in the f
 ```bash
 ./run_ddmin.sh
 ```
-You can also find our baseline Perses and Vulcan. You can invoke Vulcan by running perses. Check detail [here](https://github.com/uw-pluverse/perses)
 
-You need MLIR.g4 to start with Perses and Vulcan. We already prepared it in the Perses folder (and also added necessary modifications in our Perses), so you should be able to run it directly with the MLIR generic.
-
-If you want to add a new benchmark, you need to provide an oracle (to check the bug is still here), an initial compilation path (check the example mlir-pass.txt), and the original IR code. Then do
+It is easy to start with an example
 ```
-python ddmin.py orcle.sh path.txt IRcode.mlir
+python3 ddmin.py a.generic.mlir your_path_to_circt-opt circt-pass-test.txt 4
 ```
+It means we apply delta debugging for a.generic.mlir, with possible pass in circt-pass-test.txt, and parallelize it with 4 sub-process. The general form is followed:
+```
+python3 ddmin.py your.mlir your_path_to_circt-opt your_mlir_pass.txt para_number [possible_test_script.sh]
+```
+You can add your own test oracle as a test script. It should exit 0 when it pass the oracle and exit 1 otherwise

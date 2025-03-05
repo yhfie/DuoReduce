@@ -1,0 +1,6 @@
+//mlir-opt --convert-cf-to-llvm a.mlir
+    %c6 = arith.constant 6 : index
+  %6 = llvm.mlir.constant(24583 : i16) : i16
+  %7 = vector.mask %cst_8 { vector.mask %cst_6 { vector.multi_reduction <and>, %cst_6, %cst_6 [] : vector<10xi1> to vector<10xi1> } : vector<10xi1> -> vector<10xi1> } : vector<27xi1> -> vector<27xi1>
+  return
+}
