@@ -1,3 +1,7 @@
 [submodule "onnx-mlir"]
 	path = onnx-mlir
 	url = https://github.com/benlimpa/onnx-mlir.git
+
+[submodule "protobuf"]
+	path = protobuf
+	url = https://github.com/protocolbuffers/protobuf.git
